@@ -210,7 +210,7 @@
             postsListContainer.innerHTML = posts.map(post => `
                 <div class="post-management-item">
                     <div class="post-management-info">
-                        <h4>${post.title}</h4>
+                        <h4>#${post.id}: ${post.title}</h4>
                         <small>${post.category} • ${new Date(post.date).toLocaleDateString()}</small>
                     </div>
                     <button class="btn-delete" onclick="deletePost(${post.id})">Delete</button>
