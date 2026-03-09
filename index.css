@@ -513,3 +513,25 @@ nav {
 [data-theme="dark"] .article-image {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
+
+/* Footnote Highlights */
+@keyframes highlight-fade {
+    0% {
+        background-color: var(--accent);
+        color: white;
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.footnote-highlight {
+    animation: highlight-fade 2s ease-out;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+:target {
+    scroll-margin-top: 100px;
+}

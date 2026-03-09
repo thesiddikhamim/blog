@@ -129,8 +129,36 @@ function renderSinglePost() {
                 </div>
             </section>
         `;
+
+        // Process all links to open in new tab and handle footnotes
+        const articleLinks = container.querySelectorAll('.article-body a');
+        articleLinks.forEach(link => {
+            // 1. External links open in new tab
+            if (link.hostname !== window.location.hostname && link.hostname !== '') {
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener noreferrer');
+            }
+
+            // 2. Footnote smooth scroll and highlight
+            if (link.classList.contains('footnote-ref') || link.classList.contains('footnote-backref')) {
+                link.addEventListener('click', (e) => {
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        // Apply highlight class
+                        targetElement.classList.add('footnote-highlight');
+                        // Remove it after animation finishes so it can be re-triggered
+                        setTimeout(() => {
+                            targetElement.classList.remove('footnote-highlight');
+                        }, 2000);
+                    }
+                });
+            }
+        });
     }
 }
+
 
 function renderRelatedPosts(currentPost) {
     const related = blogPosts
