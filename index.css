@@ -495,13 +495,38 @@ nav {
     color: var(--text-secondary);
 }
 
+.footnotes a {
+    color: #3b82f6;
+    /* Modern Blue */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.footnotes a:hover {
+    color: var(--accent);
+}
+
+
 .footnotes-list {
     padding-left: 1.5rem;
 }
 
 .footnote-item {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+    padding-left: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
+
+.footnote-item:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.footnotes-list li::marker {
+    color: #3b82f6;
+    font-weight: bold;
+}
+
 
 .footnote-backref {
     text-decoration: none;

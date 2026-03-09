@@ -158,10 +158,24 @@ function renderSinglePost() {
                     }
                 });
             }
+        });
 
+        // 3. Make the whole footnote list item clickable to go back to source
+        const footnoteItems = container.querySelectorAll('.footnote-item');
+        footnoteItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                // If they clicked the back-arrow specifically, don't do it twice
+                if (e.target.classList.contains('footnote-backref')) return;
+
+                const backRefLink = item.querySelector('.footnote-backref');
+                if (backRefLink) {
+                    backRefLink.click();
+                }
+            });
         });
     }
 }
+
 
 
 function renderRelatedPosts(currentPost) {
