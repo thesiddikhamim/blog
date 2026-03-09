@@ -28,6 +28,45 @@ const IMAGES_DIR = path.join(__dirname, 'images');
 // Ensure images directory exists
 fs.ensureDirSync(IMAGES_DIR);
 
+// GET /posts - Return all posts
+app.get('/posts', async (req, res) => {
+    try {
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        res.json(posts);
+    } catch (error) {
+        console.error('GET /posts error:', error);
+        res.status(500).send('Error reading posts: ' + error.message);
+    }
+});
+
+// DELETE /posts/:id - Delete a post AND its images
+app.delete('/posts/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        let posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+
+        // Find existing post to log deletion
+        const postExists = posts.some(p => p.id === id);
+        if (!postExists) return res.status(404).json({ success: false, message: 'Post not found.' });
+
+        // Filter out the post
+        posts = posts.filter(p => p.id !== id);
+        await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+
+        // DELETE THE IMAGES DIRECTORY FOR THIS POST
+        const postImagesDir = path.join(IMAGES_DIR, id.toString());
+        if (await fs.pathExists(postImagesDir)) {
+            await fs.remove(postImagesDir);
+            console.log(`Deleted images for post ${id}`);
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('DELETE error:', error);
+        res.status(500).send('Error deleting post.');
+    }
+});
+
 app.post('/upload', upload.fields([
     { name: 'markdown', maxCount: 1 },
     { name: 'images' }
@@ -49,7 +88,14 @@ app.post('/upload', upload.fields([
         const frontMatter = yaml.load(parts[1]);
         let content = parts.slice(2).join('---').trim();
 
-        // 2. Process Images
+        // 2. Prepare POST ID FIRST (to create the correct directory)
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
+
+        const postImagesDir = path.join(IMAGES_DIR, newId.toString());
+        await fs.ensureDir(postImagesDir);
+
+        // 3. Process All Uploaded Images INTO the subfolder
         const uploadedImages = req.files['images'] || [];
         const imageMap = {};
 
@@ -57,35 +103,39 @@ app.post('/upload', upload.fields([
             const ext = path.extname(file.originalname).toLowerCase();
             const baseName = path.basename(file.originalname, ext);
             const webpName = `${baseName}.webp`;
-            const targetPath = path.join(IMAGES_DIR, webpName);
+            const targetPath = path.join(postImagesDir, webpName);
 
             // Convert to webp and resize/compress
             await sharp(file.buffer)
-                .webp({ quality: 75 })
+                .webp({ quality: 80 })
                 .resize(1200, null, { withoutEnlargement: true })
                 .toFile(targetPath);
 
-            imageMap[file.originalname] = `images/${webpName}`;
+            // Path used in JSON/HTML
+            imageMap[file.originalname] = `images/${newId}/${webpName}`;
         }
 
-        // 3. Handle Obsidian-style images ![[image.png]]
+        // 4. Handle Obsidian-style images ![[image.png]]
         content = content.replace(/!\[\[(.*?)\]\]/g, (match, fileName) => {
             const webpPath = imageMap[fileName] || imageMap[path.basename(fileName)];
             if (webpPath) {
                 return `<img src="${webpPath}" alt="${fileName}" class="article-image">`;
             }
-            return match; // Keep as is if image not found
+            return match;
         });
 
-        // 4. Convert Markdown to HTML
+        // 5. Convert Markdown to HTML
         const htmlContent = md.render(content);
 
-        // 5. Update posts.json
-        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        // 6. Explicitly handle Hero/Cover Image
+        let heroImage = frontMatter.image || '';
+        if (imageMap[heroImage]) {
+            heroImage = imageMap[heroImage];
+        } else if (imageMap[path.basename(heroImage)]) {
+            heroImage = imageMap[path.basename(heroImage)];
+        }
 
-        // Generate new ID
-        const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
-
+        // 7. Save the final JSON
         const newPost = {
             id: newId,
             title: frontMatter.title || 'Untitled',
@@ -94,10 +144,10 @@ app.post('/upload', upload.fields([
             date: frontMatter.date || new Date().toISOString(),
             excerpt: frontMatter.excerpt || '',
             content: htmlContent,
-            image: imageMap[frontMatter.image] || frontMatter.image || ''
+            image: heroImage
         };
 
-        posts.unshift(newPost); // Add to beginning
+        posts.unshift(newPost);
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
 
         res.json({ success: true, post: newPost });

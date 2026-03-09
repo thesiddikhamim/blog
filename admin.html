@@ -13,19 +13,25 @@
     <link rel="stylesheet" href="index.css">
     <style>
         .admin-header {
-            padding: 4rem 0;
+            padding: 4rem 0 2rem 0;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
         }
 
         .upload-container {
-            max-width: 800px;
-            margin: 0 auto;
             background: var(--bg-secondary);
             padding: 3rem;
             border: 2px dashed var(--border);
             text-align: center;
             transition: all 0.3s ease;
+            position: sticky;
+            top: 100px;
         }
 
         .upload-container.dragover {
@@ -40,7 +46,7 @@
         .btn-primary {
             background: var(--text-primary);
             color: var(--bg-primary);
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             border: none;
             font-family: inherit;
             font-weight: 600;
@@ -51,6 +57,15 @@
 
         .btn-primary:hover {
             opacity: 0.9;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
         }
 
         #status-message {
@@ -73,6 +88,37 @@
             font-size: 0.875rem;
             color: var(--text-secondary);
         }
+
+        .posts-list {
+            list-style: none;
+        }
+
+        .post-management-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .post-management-info h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .post-management-info small {
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 900px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-container {
+                position: static;
+            }
+        }
     </style>
 </head>
 
@@ -91,31 +137,43 @@
     <main class="container">
         <section class="admin-header">
             <h1>Admin Dashboard</h1>
-            <p>Upload your .md files and images to publish new articles.</p>
+            <p>Manage your writings and publish new articles.</p>
         </section>
 
-        <section class="upload-section">
-            <div id="drop-zone" class="upload-container">
-                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
-                    stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <h3>Drag & Drop Files</h3>
-                <p>Upload your <strong>.md</strong> file and all referenced images.</p>
-                <input type="file" id="file-input" class="file-input" multiple accept=".md,image/*">
-                <button class="btn-primary" onclick="document.getElementById('file-input').click()">Select
-                    Files</button>
-                <div id="file-list" class="file-list"></div>
-            </div>
+        <div class="admin-grid">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2>Publish New Article</h2>
+                <div id="drop-zone" class="upload-container">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Drag & Drop Files</h3>
+                    <p>Upload <strong>.md</strong> and all images (including cover).</p>
+                    <input type="file" id="file-input" class="file-input" multiple accept=".md,image/*">
+                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Select
+                        Files</button>
+                    <div id="file-list" class="file-list"></div>
+                </div>
 
-            <div style="text-align: center; margin-top: 3rem;">
-                <button id="publish-btn" class="btn-primary"
-                    style="display: none; background: var(--accent); color: white;">Publish Article</button>
-                <div id="status-message"></div>
-            </div>
-        </section>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button id="publish-btn" class="btn-primary"
+                        style="display: none; background: var(--accent); color: white;">Publish Article</button>
+                    <div id="status-message"></div>
+                </div>
+            </section>
+
+            <!-- Management Section -->
+            <section class="management-section">
+                <h2>Your Writings</h2>
+                <div id="posts-list-container" class="posts-list">
+                    <p>Loading writings...</p>
+                </div>
+            </section>
+        </div>
     </main>
 
     <script>
@@ -124,9 +182,59 @@
         const fileList = document.getElementById('file-list');
         const publishBtn = document.getElementById('publish-btn');
         const statusMessage = document.getElementById('status-message');
+        const postsListContainer = document.getElementById('posts-list-container');
 
         let selectedFiles = [];
 
+        // Initial Load of Posts
+        async function loadPosts() {
+            try {
+                const url = '/posts';
+                console.log('Fetching:', url);
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Fetch failed: ' + response.statusText + ' at ' + response.url);
+                const posts = await response.json();
+                renderPostsList(posts);
+            } catch (error) {
+                console.error('loadPosts error:', error);
+                postsListContainer.innerHTML = `<p class="error">Error loading writings: ${error.message}</p>`;
+            }
+        }
+
+        function renderPostsList(posts) {
+            if (posts.length === 0) {
+                postsListContainer.innerHTML = '<p>No writings yet.</p>';
+                return;
+            }
+
+            postsListContainer.innerHTML = posts.map(post => `
+                <div class="post-management-item">
+                    <div class="post-management-info">
+                        <h4>${post.title}</h4>
+                        <small>${post.category} • ${new Date(post.date).toLocaleDateString()}</small>
+                    </div>
+                    <button class="btn-delete" onclick="deletePost(${post.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        async function deletePost(id) {
+            if (!confirm('Are you sure you want to delete this writing?')) return;
+
+            try {
+                const response = await fetch(`/posts/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    loadPosts();
+                }
+            } catch (error) {
+                alert('Delete failed.');
+            }
+        }
+
+        // Drag & Drop Handlers
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, preventDefaults, false);
         });
@@ -148,12 +256,11 @@
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files), false);
 
         function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
+            handleFiles(e.dataTransfer.files);
         }
 
         function handleFiles(files) {
+            // Reset for new selection if desired, or append
             selectedFiles = [...selectedFiles, ...Array.from(files)];
             updateFileList();
             publishBtn.style.display = 'inline-block';
@@ -161,7 +268,7 @@
 
         function updateFileList() {
             fileList.innerHTML = '<strong>Files selected:</strong><br>' +
-                selectedFiles.map(f => f.name).join('<br>');
+                selectedFiles.map(f => `• ${f.name}`).join('<br>');
         }
 
         publishBtn.addEventListener('click', async () => {
@@ -179,9 +286,9 @@
 
             try {
                 publishBtn.disabled = true;
-                publishBtn.textContent = 'Processing...';
+                publishBtn.textContent = 'Publishing...';
 
-                const response = await fetch('http://localhost:3000/upload', {
+                const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -189,8 +296,11 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showStatus('Article published successfully! Redirecting to home...', 'success');
-                    setTimeout(() => window.location.href = 'index.html', 2000);
+                    showStatus('Published successfully!', 'success');
+                    selectedFiles = [];
+                    updateFileList();
+                    publishBtn.style.display = 'none';
+                    loadPosts(); // Refresh list
                 } else {
                     showStatus('Error: ' + result.message, 'error');
                 }
@@ -206,7 +316,11 @@
             statusMessage.textContent = msg;
             statusMessage.style.display = 'block';
             statusMessage.className = type;
+            setTimeout(() => statusMessage.style.display = 'none', 5000);
         }
+
+        // Initialize
+        loadPosts();
     </script>
 </body>
 
