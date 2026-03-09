@@ -105,11 +105,23 @@ app.post('/upload', upload.fields([
             const webpName = `${baseName}.webp`;
             const targetPath = path.join(postImagesDir, webpName);
 
-            // Convert to webp and resize/compress
-            await sharp(file.buffer)
-                .webp({ quality: 80 })
-                .resize(1200, null, { withoutEnlargement: true })
-                .toFile(targetPath);
+            // Check if larger than 300KB
+            const isSmall = file.buffer.length < 307200;
+
+            let sharpInstance = sharp(file.buffer);
+
+            if (isSmall) {
+                // If small, don't resize and keep high quality
+                await sharpInstance
+                    .webp({ quality: 95 })
+                    .toFile(targetPath);
+            } else {
+                // If large, resize and compress
+                await sharpInstance
+                    .webp({ quality: 80 })
+                    .resize(1200, null, { withoutEnlargement: true })
+                    .toFile(targetPath);
+            }
 
             // Path used in JSON/HTML
             imageMap[file.originalname] = `images/${newId}/${webpName}`;
