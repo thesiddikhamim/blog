@@ -1,9 +1,27 @@
 [
     {
+        "id": 6,
+        "title": "The Future of Digital Philosophy",
+        "category": "Philosophy & Ideas",
+        "tags": [
+            "Digital",
+            "Ethics",
+            "AI"
+        ],
+        "date": "2026-03-09T23:00:00.000Z",
+        "excerpt": "Exploring the intersection of human consciousness and machine intelligence in the 21st century.",
+        "content": "<p>make a website with html, css and javascript where i will give photos of my writing (should include both camera and upload system) and that will transcribe my writing with gemini api. In the top right corner there should be three bar icon if i click that there should be all kind of settings such as pasting the gemini api key. selecting the gemini ai model and so on.\n<img src=\"images/cambridge.webp\" alt=\"cambridge.png\" class=\"article-image\">\nIt should include the paragraph system the way it is written in the photo. Also in the given photo is there any word miss spelled then it should correct but in a separate space it should show me all of my spelling mistakes all well as grammatical problems and it’s solutions <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></p>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\">\n<ol class=\"footnotes-list\">\n<li id=\"fn1\" class=\"footnote-item\"><p>This is not okay <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></p>\n</li>\n</ol>\n</section>\n",
+        "image": "images/cambridge.webp"
+    },
+    {
         "id": 1,
         "title": "The Silent Revolution: Re-evaluating Modern Monetary Theory",
         "category": "Economics & Politics",
-        "tags": ["Economics", "Monetary Policy", "Future"],
+        "tags": [
+            "Economics",
+            "Monetary Policy",
+            "Future"
+        ],
         "date": "2026-03-04T10:00:00Z",
         "excerpt": "In an era of unprecedented debt and fluctuating interest rates, Modern Monetary Theory offers a controversial yet compelling lens through which to view our financial future.",
         "content": "Modern Monetary Theory (MMT) has transitioned from a fringe academic pursuit to a central pillar of macroeconomic debate. At its core, MMT suggests that currency-issuing governments are not constrained by taxes or borrowing for spending, but by inflation. <br><br><blockquote>The constraint is not money, but resources and the capacity to produce.</blockquote> This shift in perspective challenges decades of fiscal orthodoxy. As we navigate the post-pandemic landscape, the application of MMT principles could either stabilize our global economy or lead to unprecedented inflationary pressures. Only time will tell if this radical rethink is the solution we've been searching for.",
@@ -13,7 +31,11 @@
         "id": 2,
         "title": "Stoicism in the Digital Age: Finding Stillness in Noise",
         "category": "Philosophy & Ideas",
-        "tags": ["Philosophy", "Stoicism", "Mindfulness"],
+        "tags": [
+            "Philosophy",
+            "Stoicism",
+            "Mindfulness"
+        ],
         "date": "2026-03-01T12:00:00Z",
         "excerpt": "How can ancient wisdom from Marcus Aurelius and Epictetus guide us through the constant barrage of notifications and the digital hustle?",
         "content": "The digital landscape is a cacophony of demands on our attention. Stoicism, an ancient Greek philosophy, offers a framework for maintaining inner peace amidst external chaos. By distinguishing between what is within our control and what is not, we can find a sanctuary of stillness. <br><br><blockquote>Very little is needed to make a happy life; it is all within yourself in your way of thinking. — Marcus Aurelius</blockquote> Applying these principles today means setting boundaries with technology and focusing on our own character and responses rather than the shifting tides of online discourse.",
@@ -23,7 +45,11 @@
         "id": 3,
         "title": "The Geopolitics of Semiconductors",
         "category": "Economics & Politics",
-        "tags": ["Politics", "Technology", "Global Trade"],
+        "tags": [
+            "Politics",
+            "Technology",
+            "Global Trade"
+        ],
         "date": "2026-02-25T09:00:00Z",
         "excerpt": "Silicon has become the new oil. Understanding the power dynamics behind the world's most critical supply chain.",
         "content": "Centuries ago, nations fought over spice routes and gold mines. Today, the most vital resource is measured in nanometers. Semiconductors are the lifeblood of modern civilization, powering everything from smartphones to advanced defense systems. <br><br>The concentration of high-end chip manufacturing in a few geographic locations has created a fragile and highly political supply chain. As major powers invest billions to secure domestic production, the map of global influence is being redrawn by the physics of silicon.",
@@ -33,7 +59,11 @@
         "id": 4,
         "title": "Existentialism and the Search for Meaning",
         "category": "Philosophy & Ideas",
-        "tags": ["Philosophy", "Existentialism", "Ethics"],
+        "tags": [
+            "Philosophy",
+            "Existentialism",
+            "Ethics"
+        ],
         "date": "2026-02-15T15:30:00Z",
         "excerpt": "Sartre, Camus, and the burden of absolute freedom in a world that offers no inherent purpose.",
         "content": "Existentialism is often misunderstood as a philosophy of despair. In reality, it is a philosophy of radical responsibility. Jean-Paul Sartre argued that 'existence precedes essence,' meaning we are not born with a predefined purpose but must create our own through our choices. <br><br>This freedom can be staggering, leading to what Kierkegaard called 'dread.' Yet, it is also the source of our dignity. To live authentically is to embrace this freedom and take full ownership of the meaning we carve out for ourselves.",
@@ -43,7 +73,11 @@
         "id": 5,
         "title": "The Rise of Green Protectionism",
         "category": "Economics & Politics",
-        "tags": ["Economics", "Climate Change", "Trade"],
+        "tags": [
+            "Economics",
+            "Climate Change",
+            "Trade"
+        ],
         "date": "2026-02-10T08:00:00Z",
         "excerpt": "How climate policy is being used as a tool for economic nationalism and its implications for global cooperation.",
         "content": "As nations race to meet carbon neutrality goals, a new trend is emerging: green protectionism. Subsidies for local clean-tech industries and carbon border adjustment mechanisms are becoming common. Though intended to save the planet, these policies often create friction in international trade. <br><br>The challenge lies in balancing the urgent need for environmental action with the principles of free and fair trade. If global cooperation falters, the green transition may become a source of conflict rather than a shared human achievement.",
