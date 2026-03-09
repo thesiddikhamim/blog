@@ -1,0 +1,32 @@
+{
+  "name": "blogging-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scripts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thesiddikhamim/blog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thesiddikhamim/blog/issues"
+  },
+  "homepage": "https://github.com/thesiddikhamim/blog#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "fs-extra": "^11.3.4",
+    "js-yaml": "^4.1.1",
+    "markdown-it": "^14.1.1",
+    "markdown-it-footnote": "^4.0.0",
+    "multer": "^2.1.1",
+    "sharp": "^0.34.5"
+  }
+}

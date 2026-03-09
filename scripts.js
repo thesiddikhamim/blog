@@ -100,7 +100,7 @@ function renderSinglePost() {
             <div class="content-narrow">
                 <span class="accent-tag">${post.category}</span>
                 <h1 class="post-title">${post.title}</h1>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; color: var(--text-secondary);">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
                         <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" alt="Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
@@ -109,7 +109,9 @@ function renderSinglePost() {
                         <small>${getRelativeDate(post.date)}</small>
                     </div>
                 </div>
+                ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-hero-image">` : ''}
                 <div class="article-body">
+
                     ${post.content}
                 </div>
                 <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border);">

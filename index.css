@@ -441,3 +441,75 @@ nav {
         font-size: 1.5rem;
     }
 }
+
+/* Article Content Styling */
+.article-body {
+    font-family: var(--font-body);
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.article-body p {
+    margin-bottom: 2rem;
+}
+
+.post-hero-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-bottom: 3rem;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.article-body img,
+.article-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 3rem auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Captions if needed */
+.article-body figure {
+    margin: 3rem 0;
+    text-align: center;
+}
+
+.article-body figcaption {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.75rem;
+    font-style: italic;
+}
+
+/* Base styles for footnotes */
+.footnotes {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.footnotes-list {
+    padding-left: 1.5rem;
+}
+
+.footnote-item {
+    margin-bottom: 0.5rem;
+}
+
+.footnote-backref {
+    text-decoration: none;
+    color: var(--accent);
+    margin-left: 0.5rem;
+}
+
+[data-theme="dark"] .article-body img,
+[data-theme="dark"] .article-image {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}

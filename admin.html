@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Siddik Hamim</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Serif+4:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .admin-header {
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border: 2px dashed var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .upload-container.dragover {
+            border-color: var(--accent);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 1rem 2rem;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        #status-message {
+            margin-top: 2rem;
+            padding: 1rem;
+            display: none;
+        }
+
+        .success {
+            color: #2ecc71;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .file-list {
+            text-align: left;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="nav-brand">Siddik Hamim</a>
+                <ul class="nav-links">
+                    <li><a href="index.html">View Site</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <p>Upload your .md files and images to publish new articles.</p>
+        </section>
+
+        <section class="upload-section">
+            <div id="drop-zone" class="upload-container">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
+                    stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <h3>Drag & Drop Files</h3>
+                <p>Upload your <strong>.md</strong> file and all referenced images.</p>
+                <input type="file" id="file-input" class="file-input" multiple accept=".md,image/*">
+                <button class="btn-primary" onclick="document.getElementById('file-input').click()">Select
+                    Files</button>
+                <div id="file-list" class="file-list"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <button id="publish-btn" class="btn-primary"
+                    style="display: none; background: var(--accent); color: white;">Publish Article</button>
+                <div id="status-message"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const publishBtn = document.getElementById('publish-btn');
+        const statusMessage = document.getElementById('status-message');
+
+        let selectedFiles = [];
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files), false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            selectedFiles = [...selectedFiles, ...Array.from(files)];
+            updateFileList();
+            publishBtn.style.display = 'inline-block';
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = '<strong>Files selected:</strong><br>' +
+                selectedFiles.map(f => f.name).join('<br>');
+        }
+
+        publishBtn.addEventListener('click', async () => {
+            const markdownFile = selectedFiles.find(f => f.name.endsWith('.md'));
+            const images = selectedFiles.filter(f => !f.name.endsWith('.md'));
+
+            if (!markdownFile) {
+                showStatus('Please include a .md file.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('markdown', markdownFile);
+            images.forEach(img => formData.append('images', img));
+
+            try {
+                publishBtn.disabled = true;
+                publishBtn.textContent = 'Processing...';
+
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('Article published successfully! Redirecting to home...', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                } else {
+                    showStatus('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showStatus('Upload failed. Is the server running?', 'error');
+            } finally {
+                publishBtn.disabled = false;
+                publishBtn.textContent = 'Publish Article';
+            }
+        });
+
+        function showStatus(msg, type) {
+            statusMessage.textContent = msg;
+            statusMessage.style.display = 'block';
+            statusMessage.className = type;
+        }
+    </script>
+</body>
+
+</html>
