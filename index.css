@@ -398,11 +398,46 @@ nav {
 }
 
 @media (max-width: 480px) {
+    :root {
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --spacing-xl: 2.25rem;
+    }
+
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+
+    h1 {
+        font-size: 1.85rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    .hero {
+        padding: var(--spacing-md) 0;
+        margin-bottom: var(--spacing-lg);
+    }
+
     .hero h1 {
-        font-size: 2.25rem;
+        font-size: 2.15rem;
     }
 
     .nav-brand {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
+    }
+
+    .post-title {
+        margin-bottom: 1.25rem !important;
+    }
+
+    .featured-card h2 {
+        font-size: 1.5rem;
     }
 }

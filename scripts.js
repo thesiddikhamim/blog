@@ -99,7 +99,7 @@ function renderSinglePost() {
         container.innerHTML = `
             <div class="content-narrow">
                 <span class="accent-tag">${post.category}</span>
-                <h1 style="margin-bottom: 2rem;">${post.title}</h1>
+                <h1 class="post-title">${post.title}</h1>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; color: var(--text-secondary);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
                         <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" alt="Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
