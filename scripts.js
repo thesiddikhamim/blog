@@ -19,17 +19,28 @@ if (themeToggle) {
     });
 }
 
+// Mobile Menu Logic
+const menuToggle = document.getElementById('menu-toggle');
+const navLinks = document.getElementById('nav-links');
+
+if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+    });
+}
+
 // Relative Date Helper
 function getRelativeDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    
+
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
@@ -40,11 +51,12 @@ async function initBlog() {
     try {
         const response = await fetch('posts.json');
         blogPosts = await response.json();
-        
+
         // Initial render based on page
         const path = window.location.pathname;
         if (path.endsWith('index.html') || path === '/' || path.endsWith('/')) {
-            renderPosts(blogPosts);
+            renderFeaturedPost(blogPosts[0]);
+            renderPosts(blogPosts.slice(1));
         } else if (path.endsWith('post.html')) {
             renderSinglePost();
         }
@@ -56,7 +68,7 @@ async function initBlog() {
 function renderPosts(posts) {
     const container = document.getElementById('posts-container');
     if (!container) return;
-    
+
     container.innerHTML = posts.map(post => `
         <article class="article-card">
             <a href="post.html?id=${post.id}">
@@ -74,14 +86,14 @@ function renderSinglePost() {
     const params = new URLSearchParams(window.location.search);
     const id = parseInt(params.get('id'));
     const post = blogPosts.find(p => p.id === id);
-    
+
     if (!post) {
         document.getElementById('post-content').innerHTML = '<h1>Post not found</h1>';
         return;
     }
-    
+
     document.title = `${post.title} | Siddik Hamim`;
-    
+
     const container = document.getElementById('post-content');
     if (container) {
         container.innerHTML = `
@@ -122,7 +134,7 @@ function renderRelatedPosts(currentPost) {
     const related = blogPosts
         .filter(p => p.id !== currentPost.id && (p.category === currentPost.category || p.tags.some(t => currentPost.tags.includes(t))))
         .slice(0, 3);
-        
+
     return related.map(post => `
         <article class="article-card">
             <a href="post.html?id=${post.id}">
@@ -133,13 +145,44 @@ function renderRelatedPosts(currentPost) {
     `).join('');
 }
 
+function renderFeaturedPost(post) {
+    const container = document.getElementById('featured-post');
+    if (!container || !post) return;
+
+    container.innerHTML = `
+        <article class="featured-card" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--spacing-lg); align-items: center; border-bottom: 2px solid var(--text-primary); padding-bottom: var(--spacing-lg);">
+            <a href="post.html?id=${post.id}">
+                <img src="${post.image}" alt="${post.title}" class="cover-image" style="margin-bottom: 0;">
+            </a>
+            <div>
+                <span class="accent-tag">${post.category}</span>
+                <h2 style="font-size: 2.5rem;"><a href="post.html?id=${post.id}">${post.title}</a></h2>
+                <p>${post.excerpt}</p>
+                <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-secondary);">
+                    <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" style="width: 30px; height: 30px; border-radius: 50%;">
+                    <small>By Siddik Hamim • ${getRelativeDate(post.date)}</small>
+                </div>
+            </div>
+        </article>
+        
+        <style>
+            @media (max-width: 900px) {
+                .featured-card {
+                    grid-template-columns: 1fr;
+                }
+                .featured-card h2 { font-size: 2rem; }
+            }
+        </style>
+    `;
+}
+
 // Search Functionality
 const searchInput = document.getElementById('search-input');
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        const filtered = blogPosts.filter(post => 
-            post.title.toLowerCase().includes(query) || 
+        const filtered = blogPosts.filter(post =>
+            post.title.toLowerCase().includes(query) ||
             post.excerpt.toLowerCase().includes(query) ||
             post.category.toLowerCase().includes(query)
         );

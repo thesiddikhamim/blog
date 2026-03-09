@@ -18,19 +18,16 @@
     <header>
         <div class="container">
             <nav>
-                <a href="index.html"
-                    style="font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem;">Siddik Hamim</a>
-                <div style="display: flex; align-items: center; gap: 2rem;">
-                    <ul class="nav-links">
+                <a href="index.html" class="nav-brand">Siddik Hamim</a>
+                <div class="nav-container">
+                    <ul class="nav-links" id="nav-links">
                         <li><a href="index.html">Home</a></li>
                         <li><a href="about.html">About</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
-                    <div
-                        style="display: flex; align-items: center; gap: 1rem; border-left: 1px solid var(--border); padding-left: 1rem;">
-                        <button id="theme-toggle"
-                            style="background: none; border: none; cursor: pointer; color: var(--text-primary); font-size: 1.25rem;"
-                            title="Toggle Dark/Light Mode">🌓</button>
+                    <div class="nav-controls">
+                        <button id="theme-toggle" title="Toggle Dark/Light Mode">🌓</button>
+                        <button id="menu-toggle" aria-label="Toggle Menu">☰</button>
                     </div>
                 </div>
             </nav>
