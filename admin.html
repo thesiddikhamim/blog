@@ -110,6 +110,17 @@
             color: var(--text-secondary);
         }
 
+        .post-link {
+            text-decoration: none;
+            color: inherit;
+            flex-grow: 1;
+            transition: opacity 0.2s;
+        }
+
+        .post-link:hover {
+            opacity: 0.7;
+        }
+
         @media (max-width: 900px) {
             .admin-grid {
                 grid-template-columns: 1fr;
@@ -209,10 +220,12 @@
 
             postsListContainer.innerHTML = posts.map(post => `
                 <div class="post-management-item">
-                    <div class="post-management-info">
-                        <h4>#${post.id}: ${post.title}</h4>
-                        <small>${post.category} • ${new Date(post.date).toLocaleDateString()}</small>
-                    </div>
+                    <a href="post.html?id=${post.id}" target="_blank" class="post-link">
+                        <div class="post-management-info">
+                            <h4>#${post.id}: ${post.title}</h4>
+                            <small>${post.category} • ${new Date(post.date).toLocaleDateString()}</small>
+                        </div>
+                    </a>
                     <button class="btn-delete" onclick="deletePost(${post.id})">Delete</button>
                 </div>
             `).join('');
