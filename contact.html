@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Siddik Hamim</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-family: var(--font-heading);
+            font-weight: 600;
+        }
+
+        input,
+        textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: border-color var(--transition-speed);
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html"
+                    style="font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem;">Siddik Hamim</a>
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <ul class="nav-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                    <div
+                        style="display: flex; align-items: center; gap: 1rem; border-left: 1px solid var(--border); padding-left: 1rem;">
+                        <button id="theme-toggle"
+                            style="background: none; border: none; cursor: pointer; color: var(--text-primary); font-size: 1.25rem;"
+                            title="Toggle Dark/Light Mode">🌓</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container content-narrow">
+        <section style="margin-top: var(--spacing-lg);">
+            <h1>Get in Touch</h1>
+            <p>If you have thoughts on any of the articles, or simply want to engage in a conversation about Economics,
+                Philosophy, or Politics, feel free to reach out. I value thoughtful dialogue and will do my best to
+                respond.</p>
+
+            <form class="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="E.g. Marcus Aurelius" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Your reflections..." required></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer
+        style="margin-top: var(--spacing-xl); padding: var(--spacing-lg) 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary);">
+        <div class="container">
+            <h3 style="margin-bottom: 0.5rem;">Siddik Hamim</h3>
+            <p>Thinking carefully about the world.</p>
+            <nav style="justify-content: center; margin-top: 2rem;">
+                <ul class="nav-links" style="gap: 2rem;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <p style="margin-top: 2rem; font-size: 0.875rem;">&copy; 2026 Siddik Hamim. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>

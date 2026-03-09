@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siddik Hamim | Thinking carefully about the world.</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" style="font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem;">Siddik Hamim</a>
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <ul class="nav-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                    <div style="display: flex; align-items: center; gap: 1rem; border-left: 1px solid var(--border); padding-left: 1rem;">
+                        <input type="text" id="search-input" placeholder="Search articles..." style="padding: 0.5rem; border: none; background: var(--bg-secondary); color: var(--text-primary); font-family: var(--font-body);">
+                        <button id="theme-toggle" style="background: none; border: none; cursor: pointer; color: var(--text-primary); font-size: 1.25rem;" title="Toggle Dark/Light Mode">🌓</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Siddik Hamim</h1>
+            <p class="tagline">Thinking carefully about the world.</p>
+        </section>
+
+        <!-- Featured Section (Placeholder for latest) -->
+        <section id="featured-post" style="margin-bottom: var(--spacing-xl);">
+            <!-- Will be populated by JS if needed or hardcoded if specific -->
+        </section>
+
+        <h2>All Articles</h2>
+        <div id="posts-container" class="article-grid">
+            <!-- Posts injected by JS -->
+            <p>Loading deep thoughts...</p>
+        </div>
+
+        <section style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
+            <h2>You Might Also Like</h2>
+            <div class="article-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <!-- Related posts injected by JS or similar logic -->
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: var(--spacing-xl); padding: var(--spacing-lg) 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary);">
+        <div class="container">
+            <h3 style="margin-bottom: 0.5rem;">Siddik Hamim</h3>
+            <p>Thinking carefully about the world.</p>
+            <nav style="justify-content: center; margin-top: 2rem;">
+                <ul class="nav-links" style="gap: 2rem;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <p style="margin-top: 2rem; font-size: 0.875rem;">&copy; 2026 Siddik Hamim. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
