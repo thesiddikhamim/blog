@@ -289,10 +289,13 @@ nav {
 
 .hero h1 {
     font-size: clamp(2.5rem, 8vw, 4rem);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0rem;
 }
 
-.hero p.tagline {
+.tagline {
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-sm) 0;
     font-style: italic;
     color: var(--text-secondary);
     font-size: clamp(1rem, 3vw, 1.25rem);
