@@ -150,29 +150,20 @@ function renderFeaturedPost(post) {
     if (!container || !post) return;
 
     container.innerHTML = `
-        <article class="featured-card" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--spacing-lg); align-items: center; border-bottom: 2px solid var(--text-primary); padding-bottom: var(--spacing-lg);">
+        <article class="featured-card">
             <a href="post.html?id=${post.id}">
-                <img src="${post.image}" alt="${post.title}" class="cover-image" style="margin-bottom: 0;">
+                <img src="${post.image}" alt="${post.title}" class="cover-image">
             </a>
             <div>
                 <span class="accent-tag">${post.category}</span>
-                <h2 style="font-size: 2.5rem;"><a href="post.html?id=${post.id}">${post.title}</a></h2>
+                <h2><a href="post.html?id=${post.id}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
-                <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-secondary);">
-                    <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" style="width: 30px; height: 30px; border-radius: 50%;">
+                <div class="featured-author">
+                    <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" alt="Siddik Hamim">
                     <small>By Siddik Hamim • ${getRelativeDate(post.date)}</small>
                 </div>
             </div>
         </article>
-        
-        <style>
-            @media (max-width: 900px) {
-                .featured-card {
-                    grid-template-columns: 1fr;
-                }
-                .featured-card h2 { font-size: 2rem; }
-            }
-        </style>
     `;
 }
 
@@ -181,6 +172,14 @@ const searchInput = document.getElementById('search-input');
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
+        const featuredSection = document.getElementById('featured-post');
+
+        if (query.trim() !== '') {
+            if (featuredSection) featuredSection.style.display = 'none';
+        } else {
+            if (featuredSection) featuredSection.style.display = 'block';
+        }
+
         const filtered = blogPosts.filter(post =>
             post.title.toLowerCase().includes(query) ||
             post.excerpt.toLowerCase().includes(query) ||
