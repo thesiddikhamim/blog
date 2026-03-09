@@ -1,10 +1,29 @@
 // Theme Management
 const themeToggle = document.getElementById('theme-toggle');
-const currentTheme = localStorage.getItem('theme') || 'light';
+const currentTheme = localStorage.getItem('theme') || 'dark'; // Use dark by default as per previous context or preference
 
+function updateThemeIcon() {
+    if (!themeToggle) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    themeToggle.innerHTML = isDark
+        ? `<i data-lucide="sun"></i>`
+        : `<i data-lucide="moon"></i>`;
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+}
+
+// Initial set
 if (currentTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
+} else {
+    document.documentElement.removeAttribute('data-theme');
 }
+
+// Update icon on load
+document.addEventListener('DOMContentLoaded', () => {
+    updateThemeIcon();
+});
 
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
@@ -16,6 +35,7 @@ if (themeToggle) {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
         }
+        updateThemeIcon();
     });
 }
 
