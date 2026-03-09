@@ -146,15 +146,19 @@ function renderSinglePost() {
                     const targetElement = document.getElementById(targetId);
 
                     if (targetElement) {
-                        // Apply highlight class
-                        targetElement.classList.add('footnote-highlight');
-                        // Remove it after animation finishes so it can be re-triggered
+                        // Apply unique highlight class based on direction
+                        const highlightClass = link.classList.contains('footnote-ref') ? 'footnote-target-highlight' : 'footnote-ref-highlight';
+
+                        targetElement.classList.add(highlightClass);
+
+                        // Remove after animation (2.5s to be safe)
                         setTimeout(() => {
-                            targetElement.classList.remove('footnote-highlight');
-                        }, 2000);
+                            targetElement.classList.remove(highlightClass);
+                        }, 2500);
                     }
                 });
             }
+
         });
     }
 }

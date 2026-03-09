@@ -507,7 +507,23 @@ nav {
     text-decoration: none;
     color: var(--accent);
     margin-left: 0.5rem;
+    font-weight: bold;
 }
+
+.footnote-ref {
+    color: #3b82f6;
+    /* Modern Blue */
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0 2px;
+    transition: background-color 0.2s;
+}
+
+.footnote-ref:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-radius: 2px;
+}
+
 
 [data-theme="dark"] .article-body img,
 [data-theme="dark"] .article-image {
@@ -515,7 +531,7 @@ nav {
 }
 
 /* Footnote Highlights */
-@keyframes highlight-fade {
+@keyframes gold-fade {
     0% {
         background-color: var(--accent);
         color: white;
@@ -526,9 +542,27 @@ nav {
     }
 }
 
-.footnote-highlight {
-    animation: highlight-fade 2s ease-out;
-    padding: 2px 4px;
+@keyframes blue-fade {
+    0% {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* When clicking [1] in text: highlight the item at the bottom */
+.footnote-target-highlight {
+    animation: gold-fade 2s ease-out;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* When clicking arrow at bottom: highlight the [1] link in text */
+.footnote-ref-highlight {
+    animation: blue-fade 2s ease-out;
     border-radius: 2px;
 }
 
