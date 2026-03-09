@@ -92,7 +92,7 @@ function renderSinglePost() {
         return;
     }
 
-    document.title = `${post.title} | Siddik Hamim`;
+    document.title = `${post.title} | Md Abu Bakkar Siddik Hamim`;
 
     const container = document.getElementById('post-content');
     if (container) {
@@ -102,10 +102,10 @@ function renderSinglePost() {
                 <h1 class="post-title">${post.title}</h1>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
-                        <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" alt="Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="https://ui-avatars.com/api/?name=Md+Abu+Bakkar+Siddik+Hamim&background=111&color=fff" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div>
-                        <strong>Siddik Hamim</strong><br>
+                        <strong>Md Abu Bakkar Siddik Hamim</strong><br>
                         <small>${getRelativeDate(post.date)}</small>
                     </div>
                 </div>
@@ -207,8 +207,8 @@ function renderFeaturedPost(post) {
                 <h2><a href="post.html?id=${post.id}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
-                    <img src="https://ui-avatars.com/api/?name=Siddik+Hamim&background=111&color=fff" alt="Siddik Hamim">
-                    <small>By Siddik Hamim • ${getRelativeDate(post.date)}</small>
+                    <img src="https://ui-avatars.com/api/?name=Md+Abu+Bakkar+Siddik+Hamim&background=111&color=fff" alt="Md Abu Bakkar Siddik Hamim">
+                    <small>By Md Abu Bakkar Siddik Hamim • ${getRelativeDate(post.date)}</small>
                 </div>
             </div>
         </article>
