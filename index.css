@@ -605,10 +605,31 @@ nav {
     color: var(--text-secondary);
 }
 
+.featured-author a {
+    display: flex;
+    align-items: center;
+}
+
 .featured-author img {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    transition: opacity 0.2s ease;
+}
+
+.featured-author a:hover img {
+    opacity: 0.8;
+}
+
+.author-link {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.author-link:hover {
+    color: var(--accent);
 }
 
 /* Article Cards */
