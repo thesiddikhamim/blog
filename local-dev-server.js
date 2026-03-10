@@ -160,7 +160,10 @@ app.post('/upload', upload.fields([
         const frontMatter = yaml.load(parts[1]);
         let content = parts.slice(2).join('---').trim();
 
-        // 2. Prepare POST ID FIRST (to create the correct directory)
+        // 2. Content Cleanup: Convert common invisible markers that break justification
+        content = content.replace(/\u00A0/g, ' '); // Non-breaking space -> regular space
+
+        // 3. Prepare POST ID FIRST (to create the correct directory)
         const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
         const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
         const postContentDir = path.join(POSTS_CONTENT_DIR, newId.toString());
