@@ -108,11 +108,14 @@ blockquote,
 .featured-card p,
 .article-card p,
 .tagline,
-.nav-brand,
-.accent-tag,
 footer p {
     -webkit-user-select: text;
     user-select: text;
+}
+
+#menu-toggle {
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* Typography Scale */
@@ -242,6 +245,16 @@ nav {
 
 .nav-links a:hover {
     color: var(--accent);
+}
+
+.nav-links a,
+.nav-brand,
+.dropdown-trigger,
+#menu-toggle,
+.accent-tag {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .nav-controls {
@@ -434,6 +447,11 @@ nav {
         z-index: 10000;
         overflow-y: auto;
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     .nav-links.active {
