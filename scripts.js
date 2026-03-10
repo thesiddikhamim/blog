@@ -1,6 +1,6 @@
 // Theme Management
 const themeToggle = document.getElementById('theme-toggle');
-const currentTheme = localStorage.getItem('theme') || 'dark'; // Use dark by default as per previous context or preference
+const currentTheme = localStorage.getItem('theme') || 'light'; // Default to light (white) theme
 
 function updateThemeIcon() {
     if (!themeToggle) return;
