@@ -750,6 +750,13 @@ nav {
     .featured-card h2 {
         font-size: 1.5rem;
     }
+
+    .article-body {
+        font-size: 1.05rem;
+        /* Slightly smaller to fit more words strictly for justification */
+        line-height: 1.6;
+        letter-spacing: -0.01em;
+    }
 }
 
 /* Article Content Styling */
@@ -759,11 +766,30 @@ nav {
     line-height: 1.8;
     color: var(--text-primary);
     text-align: justify;
-    text-wrap: pretty;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: normal;
+    text-align-last: left;
 }
 
 .article-body p {
     margin-bottom: 2rem;
+}
+
+.article-body a {
+    color: #3b82f6;
+    /* Modern Blue */
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: all 0.2s ease;
+    display: inline;
+    /* Ensure it stays in flow for proper justification */
+}
+
+.article-body a:hover {
+    color: var(--accent);
+    text-decoration-thickness: 2px;
 }
 
 .post-hero-image {

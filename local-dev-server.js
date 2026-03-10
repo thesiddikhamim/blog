@@ -11,6 +11,16 @@ const fs = require('fs-extra');
 const path = require('path');
 const cors = require('cors');
 
+const slugify = (text) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')     // Replace spaces with -
+        .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+        .replace(/--+/g, '-');    // Replace multiple - with single -
+};
+
 const app = express();
 const port = 3000;
 
@@ -150,7 +160,10 @@ app.post('/upload', upload.fields([
         const frontMatter = yaml.load(parts[1]);
         let content = parts.slice(2).join('---').trim();
 
-        // 2. Prepare POST ID FIRST (to create the correct directory)
+        // 2. Content Cleanup: Convert common invisible markers that break justification
+        content = content.replace(/\u00A0/g, ' '); // Non-breaking space -> regular space
+
+        // 3. Prepare POST ID FIRST (to create the correct directory)
         const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
         const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
         const postContentDir = path.join(POSTS_CONTENT_DIR, newId.toString());
@@ -201,10 +214,17 @@ app.post('/upload', upload.fields([
             return match;
         });
 
-        // 5. Convert Markdown to HTML
+        // 5. Handle Obsidian-style internal links [[slug]] or [[slug|display text]]
+        content = content.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
+            const displayText = text || slug;
+            const targetSlug = slugify(slug);
+            return `<a href="?${targetSlug}">${displayText}</a>`;
+        });
+
+        // 6. Convert Markdown to HTML
         const htmlContent = md.render(content);
 
-        // 6. Explicitly handle Hero/Cover Image
+        // 7. Explicitly handle Hero/Cover Image
         let heroImage = frontMatter.image || '';
         if (imageMap[heroImage]) {
             heroImage = imageMap[heroImage];
@@ -212,17 +232,7 @@ app.post('/upload', upload.fields([
             heroImage = imageMap[path.basename(heroImage)];
         }
 
-        // 7. Save the final JSON
-        const slugify = (text) => {
-            return text
-                .toString()
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-')     // Replace spaces with -
-                .replace(/[^\w-]+/g, '')  // Remove all non-word chars
-                .replace(/--+/g, '-');    // Replace multiple - with single -
-        };
-
+        // 8. Save the final JSON
         const newPost = {
             id: newId,
             slug: slugify(frontMatter.title || 'untitled'),
