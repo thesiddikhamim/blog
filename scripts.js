@@ -137,15 +137,14 @@ async function initBlog() {
 
         // Initial render based on page
         const path = window.location.pathname;
-        const isHomePage = path.endsWith('index.html') || path === '/' || path.endsWith('/') || path.includes('index.html') || path === '';
+        const isHomePage = path.endsWith('index.html') || path.endsWith('/') || path === '' || path === 'index.html';
+        const params = new URLSearchParams(window.location.search);
+        const categoryFilter = params.get('category');
 
         // Always render categories in nav if possible
         renderNavCategories();
 
         if (isHomePage) {
-            const params = new URLSearchParams(window.location.search);
-            const categoryFilter = params.get('category');
-
             if (categoryFilter) {
                 // Apply filter from URL
                 filterByCategory(categoryFilter, false);
@@ -154,7 +153,12 @@ async function initBlog() {
                 renderPosts(blogPosts.slice(1));
                 renderCategorySections();
             }
-        } else if (path.endsWith('post.html')) {
+        } else if (path.includes('post.html')) {
+            // If we are on post.html but have category and NO id, redirect to homepage
+            if (categoryFilter && !params.has('id')) {
+                window.location.href = `index.html?category=${encodeURIComponent(categoryFilter)}`;
+                return;
+            }
             renderSinglePost();
         }
 
@@ -236,6 +240,14 @@ function renderFooterCategories() {
 }
 
 window.filterByCategory = function (category, shouldScroll = true) {
+    const postsContainer = document.getElementById('posts-container');
+
+    // If we're not on the listing page (index.html), redirect to it
+    if (!postsContainer) {
+        window.location.href = `index.html?category=${encodeURIComponent(category)}`;
+        return;
+    }
+
     const featuredSection = document.getElementById('featured-post');
     const categorySections = document.getElementById('category-sections');
     const allArticlesHeader = document.getElementById('main-heading');
@@ -258,7 +270,7 @@ window.filterByCategory = function (category, shouldScroll = true) {
 
     // Scroll to the top of the filtered items
     if (shouldScroll) {
-        const scrollTarget = allArticlesHeader || document.getElementById('posts-container');
+        const scrollTarget = allArticlesHeader || postsContainer;
         if (scrollTarget) {
             window.scrollTo({ top: scrollTarget.offsetTop - 120, behavior: 'smooth' });
         }
