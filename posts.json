@@ -1,90 +1,31 @@
 [
     {
+        "id": 12,
+        "slug": "intro-to-philosophy",
+        "title": "Intro to Philosophy",
+        "category": "Philosophy",
+        "tags": [
+            "Philosophy",
+            "Science"
+        ],
+        "date": "2026-03-10T13:27:00.000Z",
+        "excerpt": "Albert Einstein explains why he support socialism and thinks capitalism is evil.",
+        "content": "<p>What is philosophy and why should we care about this? Some people are averse to learn this subject but don’t understand the value of this. The word philosophy derives from Greek. The word is combination of two words; <em><strong>philo</strong></em> which means love and <em><strong>sophy</strong></em> it means knowledge, wisdom. If we combine the words which literally means that <em><strong>love of wisdom</strong></em>. <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></p>\n<p>Philosophy is one of the foundation of all knowledge. It forces us to think critically and logically without any kind of bias. Most of use are bounded by our circumstances without noticing. Many of our believes are shaped by the society which we belongs to. But the nuances is that believing what the society is inherently bad or that can’t be true. Which can be or can’t be.</p>\n<p>There are four main brunches of philosophy which are  <a href=\"https://en.wikipedia.org/wiki/Epistemology\">epistemology</a>, <a href=\"https://en.wikipedia.org/wiki/Ethics\" title=\"Ethics\">ethics</a>, <a href=\"https://en.wikipedia.org/wiki/Logic\" title=\"Logic\">logic</a>, and <a href=\"https://en.wikipedia.org/wiki/Metaphysics\" title=\"Metaphysics\">metaphysics</a>. Epistemology deals with what is knowledge and how to gain it. Ethics studies the moral goodness and wrongness of an act. Logic studies how to distinguish good arguments from the bad ones. And finally metaphysics try to explain the reality what is it, is there anything beyond this observable universe or not and so forth.</p>\n<p>Before the modern age the term philosophy also used to describe the sciences. Natural philosophy aka science was a major branch of philosophy. <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[2]</a></sup> This brach of philosophy included a wide range of fields such as biology, chemistry, physics and so on. One example is Issac Newton’s book <em><strong>Philosophiæ Naturalis Principia Mathematica</strong></em> which was a physics book but he named it Philosophiæ. <sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[3]</a></sup></p>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\">\n<ol class=\"footnotes-list\">\n<li id=\"fn1\" class=\"footnote-item\"><p>Hoad, T. F. (1993). <em>The Concise Oxford Dictionary of English Etymology</em>. Oxford University Press. <a href=\"https://en.wikipedia.org/wiki/ISBN_(identifier)\" title=\"ISBN (identifier)\">ISBN</a> <a href=\"https://en.wikipedia.org/wiki/Special:BookSources/0-19-283098-8\" title=\"Special:BookSources/0-19-283098-8\">0-19-283098-8</a>. <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></p>\n</li>\n<li id=\"fn2\" class=\"footnote-item\"><p>Cotterell, Brian (2017). <a href=\"https://books.google.com/books?id=hpA4DwAAQBAJ&amp;pg=PA458\"><em>Physics and Culture</em></a>. World Scientific. <a href=\"https://en.wikipedia.org/wiki/ISBN_(identifier)\" title=\"ISBN (identifier)\">ISBN</a> <a href=\"https://en.wikipedia.org/wiki/Special:BookSources/978-1-78634-378-9\" title=\"Special:BookSources/978-1-78634-378-9\">978-1-78634-378-9</a>. Retrieved 25 August 2023. <a href=\"#fnref2\" class=\"footnote-backref\">↩︎</a></p>\n</li>\n<li id=\"fn3\" class=\"footnote-item\"><p>Regenbogen, Arnim (2010). <a href=\"https://meiner.de/enzyklopadie-philosophie-14071.html\">“Philosophiebegriffe”</a>. In Sandkühler, Hans Jörg (ed.). <em>Enzyklopädie Philosophie</em> (in German). Meiner. <a href=\"https://web.archive.org/web/20220320211323/https://meiner.de/enzyklopadie-philosophie-14071.html\">Archived</a> from the original on 20 March 2022. Retrieved 15 February 2022. <a href=\"#fnref3\" class=\"footnote-backref\">↩︎</a></p>\n</li>\n</ol>\n</section>\n",
+        "image": "/Posts/12/philosophy.webp"
+    },
+    {
         "id": 10,
         "slug": "why-socialism-by-albert-einstein",
         "title": "Why Socialism by Albert Einstein",
         "category": "Books",
         "tags": [
-            "Politics"
+            "Politics",
+            "Books",
+            "Philosophy"
         ],
-        "date": "2026-03-09T14:30:00.000Z",
+        "date": "2026-03-09T08:30:00.000Z",
         "excerpt": "Albert Einstein explains why he support socialism and thinks capitalism is evil.",
         "content": "<p>We all know Albert Einstein was a famous physicist, but most of us are unaware of the fact that he was actively involved in politics much of his life. He campaigned against war, advocated for socialism and opposed using nuclear weapons. He believed that scientists have a moral obligation towards humanity. In this short essay Einstein offers a moral critique of capitalism</p>\n<blockquote>\n<p>“The economic anarchy of capitalism is in my opinion the real source of evil.”</p>\n</blockquote>\n<p>While many economists have criticised his proposed solution as economically underdeveloped, a wide range of political philosophers acknowledge that he was morally right. Delighted to read something like this from an extraordinary thinker.</p>\n",
         "image": "/Posts/10/why.webp"
-    },
-    {
-        "id": 1,
-        "slug": "the-silent-revolution-re-evaluating-modern-monetary-theory",
-        "title": "The Silent Revolution: Re-evaluating Modern Monetary Theory",
-        "category": "Economics & Politics",
-        "tags": [
-            "Economics",
-            "Monetary Policy",
-            "Future"
-        ],
-        "date": "2026-03-04T10:00:00Z",
-        "excerpt": "In an era of unprecedented debt and fluctuating interest rates, Modern Monetary Theory offers a controversial yet compelling lens through which to view our financial future.",
-        "content": "Modern Monetary Theory (MMT) has transitioned from a fringe academic pursuit to a central pillar of macroeconomic debate. At its core, MMT suggests that currency-issuing governments are not constrained by taxes or borrowing for spending, but by inflation. <br><br><blockquote>The constraint is not money, but resources and the capacity to produce.</blockquote> This shift in perspective challenges decades of fiscal orthodoxy. As we navigate the post-pandemic landscape, the application of MMT principles could either stabilize our global economy or lead to unprecedented inflationary pressures. Only time will tell if this radical rethink is the solution we've been searching for.",
-        "image": "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        "id": 2,
-        "slug": "stoicism-in-the-digital-age-finding-stillness-in-noise",
-        "title": "Stoicism in the Digital Age: Finding Stillness in Noise",
-        "category": "Philosophy & Ideas",
-        "tags": [
-            "Philosophy",
-            "Stoicism",
-            "Mindfulness"
-        ],
-        "date": "2026-03-01T12:00:00Z",
-        "excerpt": "How can ancient wisdom from Marcus Aurelius and Epictetus guide us through the constant barrage of notifications and the digital hustle?",
-        "content": "The digital landscape is a cacophony of demands on our attention. Stoicism, an ancient Greek philosophy, offers a framework for maintaining inner peace amidst external chaos. By distinguishing between what is within our control and what is not, we can find a sanctuary of stillness. <br><br><blockquote>Very little is needed to make a happy life; it is all within yourself in your way of thinking. — Marcus Aurelius</blockquote> Applying these principles today means setting boundaries with technology and focusing on our own character and responses rather than the shifting tides of online discourse.",
-        "image": "https://images.unsplash.com/photo-1528459584353-5297db1a9c01?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        "id": 3,
-        "slug": "the-geopolitics-of-semiconductors",
-        "title": "The Geopolitics of Semiconductors",
-        "category": "Economics & Politics",
-        "tags": [
-            "Politics",
-            "Technology",
-            "Global Trade"
-        ],
-        "date": "2026-02-25T09:00:00Z",
-        "excerpt": "Silicon has become the new oil. Understanding the power dynamics behind the world's most critical supply chain.",
-        "content": "Centuries ago, nations fought over spice routes and gold mines. Today, the most vital resource is measured in nanometers. Semiconductors are the lifeblood of modern civilization, powering everything from smartphones to advanced defense systems. <br><br>The concentration of high-end chip manufacturing in a few geographic locations has created a fragile and highly political supply chain. As major powers invest billions to secure domestic production, the map of global influence is being redrawn by the physics of silicon.",
-        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        "id": 4,
-        "slug": "existentialism-and-the-search-for-meaning",
-        "title": "Existentialism and the Search for Meaning",
-        "category": "Philosophy & Ideas",
-        "tags": [
-            "Philosophy",
-            "Existentialism",
-            "Ethics"
-        ],
-        "date": "2026-02-15T15:30:00Z",
-        "excerpt": "Sartre, Camus, and the burden of absolute freedom in a world that offers no inherent purpose.",
-        "content": "Existentialism is often misunderstood as a philosophy of despair. In reality, it is a philosophy of radical responsibility. Jean-Paul Sartre argued that 'existence precedes essence,' meaning we are not born with a predefined purpose but must create our own through our choices. <br><br>This freedom can be staggering, leading to what Kierkegaard called 'dread.' Yet, it is also the source of our dignity. To live authentically is to embrace this freedom and take full ownership of the meaning we carve out for ourselves.",
-        "image": "https://images.unsplash.com/photo-1499244015948-ac7565d4bbaa?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-        "id": 5,
-        "slug": "the-rise-of-green-protectionism",
-        "title": "The Rise of Green Protectionism",
-        "category": "Economics & Politics",
-        "tags": [
-            "Economics",
-            "Climate Change",
-            "Trade"
-        ],
-        "date": "2026-02-10T08:00:00Z",
-        "excerpt": "How climate policy is being used as a tool for economic nationalism and its implications for global cooperation.",
-        "content": "As nations race to meet carbon neutrality goals, a new trend is emerging: green protectionism. Subsidies for local clean-tech industries and carbon border adjustment mechanisms are becoming common. Though intended to save the planet, these policies often create friction in international trade. <br><br>The challenge lies in balancing the urgent need for environmental action with the principles of free and fair trade. If global cooperation falters, the green transition may become a source of conflict rather than a shared human achievement.",
-        "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80"
     }
 ]

@@ -1,3 +1,38 @@
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-BoldItalic.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-BlackItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-ExtraBold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+
 :root {
     /* Color Palette - Light Mode */
     --bg-primary: #ffffff;
@@ -11,7 +46,7 @@
     --selection-text: #111111;
 
     /* Typography */
-    --font-heading: 'Playfair Display', serif;
+    --font-heading: 'Denton Condensed Test', serif;
     --font-body: 'Source Serif 4', serif;
 
     /* Spacing */
@@ -45,6 +80,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -54,6 +90,29 @@ body {
     line-height: 1.6;
     transition: background-color var(--transition-speed), color var(--transition-speed);
     -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.article-body,
+.content-narrow,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+.post-content,
+.featured-card p,
+.article-card p,
+.tagline,
+.nav-brand,
+.accent-tag,
+footer p {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 /* Typography Scale */
@@ -364,8 +423,8 @@ nav {
         top: 0;
         right: -100%;
         /* Off-screen */
-        width: 85%;
-        max-width: 320px;
+        width: 100%;
+        max-width: none;
         height: 100vh;
         background: var(--bg-primary);
         flex-direction: column;
@@ -420,6 +479,10 @@ nav {
         padding: 0.5rem 0 0.5rem 1rem;
         margin-top: 0;
         background: transparent;
+    }
+
+    .nav-dropdown:hover .dropdown-content {
+        display: none;
     }
 
     .nav-dropdown.mobile-open .dropdown-content {
@@ -556,6 +619,13 @@ nav {
     margin-bottom: var(--spacing-xl);
 }
 
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
 .article-card {
     border-bottom: 1px solid var(--border);
     padding-bottom: var(--spacing-md);
@@ -596,6 +666,11 @@ nav {
     }
 
     .article-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .related-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }

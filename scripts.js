@@ -53,6 +53,13 @@ function toggleMenu() {
     overlay.classList.toggle('active');
     document.body.style.overflow = isActive ? 'hidden' : '';
 
+    if (!isActive) {
+        // Reset any open dropdowns when closing the menu
+        document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('mobile-open');
+        });
+    }
+
     if (menuToggle) {
         menuToggle.innerHTML = isActive
             ? `<i data-lucide="x"></i>`
@@ -216,7 +223,7 @@ function renderCategorySections() {
                     <h2 style="margin-bottom: 0;">${category}</h2>
                     <a href="/index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
                 </div>
-                <div class="article-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                <div class="article-grid">
                     ${categoryPosts.map(post => `
                         <article class="article-card">
                             <a href="?${post.slug}">
@@ -308,7 +315,7 @@ function renderPosts(posts) {
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
                 <p>${post.excerpt}</p>
-                <small>${getRelativeDate(post.date)} • ${post.tags.join(', ')}</small>
+                <small>${getRelativeDate(post.date)} • ${post.tags ? post.tags.join(', ') : ''}</small>
             </a>
         </article>
     `).join('');
@@ -349,7 +356,7 @@ function renderSinglePost(post) {
             
             <section style="margin-top: 6rem;">
                 <h2>Related Posts</h2>
-                <div class="article-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="related-grid">
                     ${renderRelatedPosts(post)}
                 </div>
             </section>

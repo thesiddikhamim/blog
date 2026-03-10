@@ -39,6 +39,68 @@ app.get('/posts', async (req, res) => {
     }
 });
 
+// GET /posts/:id - Return a single post
+app.get('/posts/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const post = posts.find(p => p.id === id);
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found.' });
+        res.json(post);
+    } catch (error) {
+        res.status(500).send('Error reading post.');
+    }
+});
+
+// GET /categories - Return all unique categories
+app.get('/categories', async (req, res) => {
+    try {
+        console.log('Fetching unique categories...');
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const categories = [...new Set(posts.map(p => p.category).filter(Boolean))];
+        console.log(`Found ${categories.length} categories:`, categories);
+        res.json(categories.sort());
+    } catch (error) {
+        console.error('Error in /categories:', error);
+        res.status(500).json([]);
+    }
+});
+
+// GET /tags - Return all unique tags
+app.get('/tags', async (req, res) => {
+    try {
+        console.log('Fetching unique tags...');
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const tags = [...new Set(posts.flatMap(p => p.tags || []).filter(Boolean))];
+        console.log(`Found ${tags.length} unique tags:`, tags);
+        res.json(tags.sort());
+    } catch (error) {
+        console.error('Error in /tags:', error);
+        res.status(500).json([]);
+    }
+});
+
+// PUT /posts/:id - Update a post
+app.put('/posts/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const updatedData = req.body;
+        let posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const postIndex = posts.findIndex(p => p.id === id);
+
+        if (postIndex === -1) return res.status(404).json({ success: false, message: 'Post not found.' });
+
+        // Update post metadata
+        posts[postIndex] = { ...posts[postIndex], ...updatedData };
+        await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+
+        res.json({ success: true, post: posts[postIndex] });
+    } catch (error) {
+        console.error('PUT /posts/:id error:', error);
+        res.status(500).send('Error updating post.');
+    }
+});
+
 // DELETE /posts/:id - Delete a post AND its images
 app.delete('/posts/:id', async (req, res) => {
     try {
