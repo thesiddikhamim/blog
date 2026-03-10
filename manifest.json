@@ -1,0 +1,9 @@
+{
+    "name": "Hamim's Blog",
+    "short_name": "Hamim",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "description": "Question everything. Write it down."
+}

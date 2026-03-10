@@ -81,10 +81,6 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none !important;
-    user-select: none !important;
-    -webkit-touch-callout: none !important;
-    touch-action: manipulation;
 }
 
 body {
@@ -94,11 +90,23 @@ body {
     line-height: 1.6;
     transition: background-color var(--transition-speed), color var(--transition-speed);
     -webkit-font-smoothing: antialiased;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
-/* Text selection is disabled by default on body to prevent accidental selection on mobile. */
+.article-body,
+.content-narrow,
+.article-card p,
+.featured-card p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    -webkit-user-select: text;
+    user-select: text;
+}
 
 #menu-toggle {
     -webkit-user-select: none;
