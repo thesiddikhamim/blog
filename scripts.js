@@ -43,12 +43,75 @@ if (themeToggle) {
 const menuToggle = document.getElementById('menu-toggle');
 const navLinks = document.getElementById('nav-links');
 
-if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-    });
+// Create Overlay
+const overlay = document.createElement('div');
+overlay.className = 'nav-overlay';
+document.body.appendChild(overlay);
+
+function toggleMenu() {
+    const isActive = navLinks.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = isActive ? 'hidden' : '';
+
+    if (menuToggle) {
+        menuToggle.innerHTML = isActive
+            ? `<i data-lucide="x"></i>`
+            : `<i data-lucide="menu"></i>`;
+        if (window.lucide) window.lucide.createIcons();
+    }
 }
+
+if (menuToggle) {
+    menuToggle.innerHTML = `<i data-lucide="menu"></i>`;
+    menuToggle.addEventListener('click', toggleMenu);
+}
+
+overlay.addEventListener('click', toggleMenu);
+
+// Handle mobile category toggle and search
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Mobile Category Accordion
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900) {
+            const trigger = e.target.closest('.dropdown-trigger');
+            if (trigger) {
+                const dropdown = trigger.closest('.nav-dropdown');
+                if (dropdown) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('mobile-open');
+                }
+            }
+
+            // Close menu when clicking a link (except category trigger)
+            if (e.target.tagName === 'A' && !e.target.closest('.dropdown-trigger')) {
+                if (navLinks.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }
+        }
+    });
+
+    // 2. Inject Mobile Search
+    if (window.innerWidth <= 900 && navLinks && !document.querySelector('.mobile-search')) {
+        const searchWrapper = document.createElement('div');
+        searchWrapper.className = 'mobile-search';
+        searchWrapper.innerHTML = `<input type="text" placeholder="Search articles..." id="mobile-search-input">`;
+        navLinks.prepend(searchWrapper);
+
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                // Reuse existing search logic by triggering input on main search
+                const mainSearch = document.getElementById('search-input');
+                if (mainSearch) {
+                    mainSearch.value = query;
+                    mainSearch.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+    }
+});
 
 // Relative Date Helper
 function getRelativeDate(dateString) {
