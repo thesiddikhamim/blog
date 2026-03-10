@@ -11,6 +11,16 @@ const fs = require('fs-extra');
 const path = require('path');
 const cors = require('cors');
 
+const slugify = (text) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')     // Replace spaces with -
+        .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+        .replace(/--+/g, '-');    // Replace multiple - with single -
+};
+
 const app = express();
 const port = 3000;
 
@@ -201,10 +211,17 @@ app.post('/upload', upload.fields([
             return match;
         });
 
-        // 5. Convert Markdown to HTML
+        // 5. Handle Obsidian-style internal links [[slug]] or [[slug|display text]]
+        content = content.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
+            const displayText = text || slug;
+            const targetSlug = slugify(slug);
+            return `<a href="?${targetSlug}">${displayText}</a>`;
+        });
+
+        // 6. Convert Markdown to HTML
         const htmlContent = md.render(content);
 
-        // 6. Explicitly handle Hero/Cover Image
+        // 7. Explicitly handle Hero/Cover Image
         let heroImage = frontMatter.image || '';
         if (imageMap[heroImage]) {
             heroImage = imageMap[heroImage];
@@ -212,17 +229,7 @@ app.post('/upload', upload.fields([
             heroImage = imageMap[path.basename(heroImage)];
         }
 
-        // 7. Save the final JSON
-        const slugify = (text) => {
-            return text
-                .toString()
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-')     // Replace spaces with -
-                .replace(/[^\w-]+/g, '')  // Remove all non-word chars
-                .replace(/--+/g, '-');    // Replace multiple - with single -
-        };
-
+        // 8. Save the final JSON
         const newPost = {
             id: newId,
             slug: slugify(frontMatter.title || 'untitled'),
