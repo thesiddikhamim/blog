@@ -80,6 +80,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -89,6 +90,29 @@ body {
     line-height: 1.6;
     transition: background-color var(--transition-speed), color var(--transition-speed);
     -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.article-body,
+.content-narrow,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+.post-content,
+.featured-card p,
+.article-card p,
+.tagline,
+.nav-brand,
+.accent-tag,
+footer p {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 /* Typography Scale */
