@@ -132,38 +132,34 @@ let blogPosts = [];
 
 async function initBlog() {
     try {
-        const response = await fetch('posts.json');
+        const response = await fetch('/posts.json');
         blogPosts = await response.json();
 
-        // Initial render based on page
-        const path = window.location.pathname;
-        const isHomePage = path.endsWith('index.html') || path.endsWith('/') || path === '' || path === 'index.html';
-        const params = new URLSearchParams(window.location.search);
-        const categoryFilter = params.get('category');
-
-        // Always render categories in nav if possible
+        // 1. Always render global components
         renderNavCategories();
+        renderFooterCategories();
+        updateThemeIcon();
 
-        if (isHomePage) {
+        // 2. Identify current page
+        const path = window.location.pathname;
+        const isPostPage = path.includes('/post/');
+        // Stricter home page check: It's home if it's the root OR index.html AND NOT in a subfolder like /post/
+        const isHomePage = (path === '/' || path.endsWith('/index.html') || path === '') && !isPostPage;
+
+        if (isPostPage) {
+            renderSinglePostFromSlug();
+        } else if (isHomePage) {
+            const params = new URLSearchParams(window.location.search);
+            const categoryFilter = params.get('category');
+
             if (categoryFilter) {
-                // Apply filter from URL
                 filterByCategory(categoryFilter, false);
             } else {
                 renderFeaturedPost(blogPosts[0]);
                 renderPosts(blogPosts.slice(1));
                 renderCategorySections();
             }
-        } else if (path.includes('post.html')) {
-            // If we are on post.html but have category and NO id, redirect to homepage
-            if (categoryFilter && !params.has('id')) {
-                window.location.href = `index.html?category=${encodeURIComponent(categoryFilter)}`;
-                return;
-            }
-            renderSinglePost();
         }
-
-        // Render footer categories on all pages
-        renderFooterCategories();
     } catch (error) {
         console.error('Error loading blog posts:', error);
     }
@@ -180,7 +176,7 @@ function renderNavCategories() {
             <div class="nav-dropdown">
                 <button class="dropdown-trigger">Categories <i data-lucide="chevron-down"></i></button>
                 <div class="dropdown-content">
-                    ${categories.map(cat => `<a href="index.html?category=${encodeURIComponent(cat)}">${cat}</a>`).join('')}
+                    ${categories.map(cat => `<a href="/?category=${encodeURIComponent(cat)}">${cat}</a>`).join('')}
                 </div>
             </div>
         `;
@@ -204,13 +200,13 @@ function renderCategorySections() {
             <section id="${categoryId}" class="category-section" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
                     <h2 style="margin-bottom: 0;">${category}</h2>
-                    <a href="index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
+                    <a href="?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
                 </div>
                 <div class="article-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                     ${categoryPosts.map(post => `
                         <article class="article-card">
-                            <a href="post.html?id=${post.id}">
-                                <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
+                            <a href="/post/?${post.slug}">
+                                <img src="/${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
                                 <h3>${post.title}</h3>
                                 <p style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${post.excerpt}</p>
                             </a>
@@ -233,7 +229,7 @@ function renderFooterCategories() {
         footerContainer.innerHTML = `
             <h3>Categories</h3>
             <ul class="footer-category-list">
-                ${categories.map(cat => `<li><a href="index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
+                ${categories.map(cat => `<li><a href="/?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
             </ul>
         `;
     }
@@ -242,9 +238,9 @@ function renderFooterCategories() {
 window.filterByCategory = function (category, shouldScroll = true) {
     const postsContainer = document.getElementById('posts-container');
 
-    // If we're not on the listing page (index.html), redirect to it
+    // If we're not on the listing page, redirect to it
     if (!postsContainer) {
-        window.location.href = `index.html?category=${encodeURIComponent(category)}`;
+        window.location.href = `/?category=${encodeURIComponent(category)}`;
         return;
     }
 
@@ -264,7 +260,7 @@ window.filterByCategory = function (category, shouldScroll = true) {
     // Update URL state
     const params = new URLSearchParams(window.location.search);
     if (params.get('category') !== category) {
-        const newUrl = window.location.pathname + '?category=' + encodeURIComponent(category);
+        const newUrl = window.location.pathname.replace('index.html', '') + '?category=' + encodeURIComponent(category);
         window.history.pushState({ category: category }, '', newUrl);
     }
 
@@ -288,8 +284,8 @@ function renderPosts(posts) {
 
     container.innerHTML = posts.map(post => `
         <article class="article-card">
-            <a href="post.html?id=${post.id}">
-                <img src="${post.image}" alt="${post.title}" class="cover-image">
+            <a href="/post/?${post.slug}">
+                <img src="/${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
                 <p>${post.excerpt}</p>
@@ -299,15 +295,37 @@ function renderPosts(posts) {
     `).join('');
 }
 
-function renderSinglePost() {
+function renderSinglePostFromSlug() {
     const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get('id'));
-    const post = blogPosts.find(p => p.id === id);
+    const pathParts = window.location.pathname.split('/').filter(p => p !== '');
 
-    if (!post) {
-        document.getElementById('post-content').innerHTML = '<h1>Post not found</h1>';
-        return;
+    // Check if slug is in the path (/post/some-slug)
+    let slugFromPath = null;
+    if (pathParts.length > 1 && pathParts[0] === 'post') {
+        slugFromPath = pathParts[1] === 'index.html' ? null : pathParts[1];
     }
+
+    // Check if slug is in the search (?some-slug)
+    const slugFromQuery = window.location.search.substring(1).split('&')[0];
+
+    const slug = slugFromPath || slugFromQuery;
+    const post = blogPosts.find(p => p.slug === slug || p.id.toString() === slug);
+
+    if (post) {
+        renderSinglePost(post);
+    } else {
+        document.getElementById('post-content').innerHTML = `
+            <div class="content-narrow" style="text-align: center; margin-top: 6rem;">
+                <h1>Post not found</h1>
+                <p>We couldn't find the article you're looking for.</p>
+                <a href="/" class="btn" style="display: inline-block; margin-top: 2rem;">Back to Home</a>
+            </div>
+        `;
+    }
+}
+
+function renderSinglePost(post) {
+    if (!post) return;
 
     document.title = `${post.title} | Md Abu Bakkar Siddik Hamim`;
 
@@ -319,14 +337,14 @@ function renderSinglePost() {
                 <h1 class="post-title">${post.title}</h1>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
-                        <img src="photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div>
                         <strong>Md Abu Bakkar Siddik Hamim</strong><br>
                         <small>${getRelativeDate(post.date)}</small>
                     </div>
                 </div>
-                ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-hero-image">` : ''}
+                ${post.image ? `<img src="/${post.image}" alt="${post.title}" class="post-hero-image">` : ''}
                 <div class="article-body">
 
                     ${post.content}
@@ -402,8 +420,8 @@ function renderRelatedPosts(currentPost) {
 
     return related.map(post => `
         <article class="article-card">
-            <a href="post.html?id=${post.id}">
-                <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 4/3;">
+            <a href="/post/?${post.slug}">
+                <img src="/${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 4/3;">
                 <h3>${post.title}</h3>
             </a>
         </article>
@@ -416,15 +434,15 @@ function renderFeaturedPost(post) {
 
     container.innerHTML = `
         <article class="featured-card">
-            <a href="post.html?id=${post.id}">
-                <img src="${post.image}" alt="${post.title}" class="cover-image">
+            <a href="/post/?${post.slug}">
+                <img src="/${post.image}" alt="${post.title}" class="cover-image">
             </a>
             <div>
                 <span class="accent-tag">${post.category}</span>
-                <h2><a href="post.html?id=${post.id}">${post.title}</a></h2>
+                <h2><a href="/post/?${post.slug}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
-                    <img src="photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
+                    <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
                     <small>By Md Abu Bakkar Siddik Hamim • ${getRelativeDate(post.date)}</small>
                 </div>
             </div>

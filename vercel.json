@@ -1,0 +1,10 @@
+{
+    "cleanUrls": true,
+    "trailingSlash": true,
+    "rewrites": [
+        {
+            "source": "/post/:slug",
+            "destination": "/post/index.html"
+        }
+    ]
+}

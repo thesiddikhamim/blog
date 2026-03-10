@@ -1,6 +1,7 @@
 [
     {
         "id": 10,
+        "slug": "why-socialism-by-albert-einstein",
         "title": "Why Socialism by Albert Einstein",
         "category": "Books",
         "tags": [
@@ -13,6 +14,7 @@
     },
     {
         "id": 9,
+        "slug": "the-architecture-of-ancient-thought",
         "title": "The Architecture of Ancient Thought",
         "category": "Philosophy & Ideas",
         "tags": [
@@ -27,6 +29,7 @@
     },
     {
         "id": 8,
+        "slug": "the-future-of-digital-philosophy",
         "title": "The Future of Digital Philosophy",
         "category": "Philosophy & Ideas",
         "tags": [
@@ -41,6 +44,7 @@
     },
     {
         "id": 1,
+        "slug": "the-silent-revolution-re-evaluating-modern-monetary-theory",
         "title": "The Silent Revolution: Re-evaluating Modern Monetary Theory",
         "category": "Economics & Politics",
         "tags": [
@@ -55,6 +59,7 @@
     },
     {
         "id": 2,
+        "slug": "stoicism-in-the-digital-age-finding-stillness-in-noise",
         "title": "Stoicism in the Digital Age: Finding Stillness in Noise",
         "category": "Philosophy & Ideas",
         "tags": [
@@ -69,6 +74,7 @@
     },
     {
         "id": 3,
+        "slug": "the-geopolitics-of-semiconductors",
         "title": "The Geopolitics of Semiconductors",
         "category": "Economics & Politics",
         "tags": [
@@ -83,6 +89,7 @@
     },
     {
         "id": 4,
+        "slug": "existentialism-and-the-search-for-meaning",
         "title": "Existentialism and the Search for Meaning",
         "category": "Philosophy & Ideas",
         "tags": [
@@ -97,6 +104,7 @@
     },
     {
         "id": 5,
+        "slug": "the-rise-of-green-protectionism",
         "title": "The Rise of Green Protectionism",
         "category": "Economics & Politics",
         "tags": [

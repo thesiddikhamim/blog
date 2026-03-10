@@ -148,8 +148,19 @@ app.post('/upload', upload.fields([
         }
 
         // 7. Save the final JSON
+        const slugify = (text) => {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')     // Replace spaces with -
+                .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+                .replace(/--+/g, '-');    // Replace multiple - with single -
+        };
+
         const newPost = {
             id: newId,
+            slug: slugify(frontMatter.title || 'untitled'),
             title: frontMatter.title || 'Untitled',
             category: frontMatter.category || 'Uncategorized',
             tags: frontMatter.tags || [],
