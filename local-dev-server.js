@@ -23,10 +23,10 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const POSTS_FILE = path.join(__dirname, 'posts.json');
-const IMAGES_DIR = path.join(__dirname, 'images');
+const POSTS_CONTENT_DIR = path.join(__dirname, 'Posts');
 
-// Ensure images directory exists
-fs.ensureDirSync(IMAGES_DIR);
+// Ensure Posts directory exists
+fs.ensureDirSync(POSTS_CONTENT_DIR);
 
 // GET /posts - Return all posts
 app.get('/posts', async (req, res) => {
@@ -53,11 +53,11 @@ app.delete('/posts/:id', async (req, res) => {
         posts = posts.filter(p => p.id !== id);
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
 
-        // DELETE THE IMAGES DIRECTORY FOR THIS POST
-        const postImagesDir = path.join(IMAGES_DIR, id.toString());
-        if (await fs.pathExists(postImagesDir)) {
-            await fs.remove(postImagesDir);
-            console.log(`Deleted images for post ${id}`);
+        // DELETE THE CONTENT DIRECTORY FOR THIS POST
+        const postContentDir = path.join(POSTS_CONTENT_DIR, id.toString());
+        if (await fs.pathExists(postContentDir)) {
+            await fs.remove(postContentDir);
+            console.log(`Deleted content for post ${id}`);
         }
 
         res.json({ success: true });
@@ -91,9 +91,12 @@ app.post('/upload', upload.fields([
         // 2. Prepare POST ID FIRST (to create the correct directory)
         const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
         const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
+        const postContentDir = path.join(POSTS_CONTENT_DIR, newId.toString());
+        await fs.ensureDir(postContentDir);
 
-        const postImagesDir = path.join(IMAGES_DIR, newId.toString());
-        await fs.ensureDir(postImagesDir);
+        // Save original markdown file
+        const mdFileName = mdFile.originalname || 'post.md';
+        await fs.writeFile(path.join(postContentDir, mdFileName), mdFile.buffer);
 
         // 3. Process All Uploaded Images INTO the subfolder
         const uploadedImages = req.files['images'] || [];
@@ -103,7 +106,7 @@ app.post('/upload', upload.fields([
             const ext = path.extname(file.originalname).toLowerCase();
             const baseName = path.basename(file.originalname, ext);
             const webpName = `${baseName}.webp`;
-            const targetPath = path.join(postImagesDir, webpName);
+            const targetPath = path.join(postContentDir, webpName);
 
             // Check if larger than 300KB
             const isSmall = file.buffer.length < 307200;
@@ -124,7 +127,7 @@ app.post('/upload', upload.fields([
             }
 
             // Path used in JSON/HTML
-            imageMap[file.originalname] = `images/${newId}/${webpName}`;
+            imageMap[file.originalname] = `/Posts/${newId}/${webpName}`;
         }
 
         // 4. Handle Obsidian-style images ![[image.png]]
@@ -148,8 +151,19 @@ app.post('/upload', upload.fields([
         }
 
         // 7. Save the final JSON
+        const slugify = (text) => {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')     // Replace spaces with -
+                .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+                .replace(/--+/g, '-');    // Replace multiple - with single -
+        };
+
         const newPost = {
             id: newId,
+            slug: slugify(frontMatter.title || 'untitled'),
             title: frontMatter.title || 'Untitled',
             category: frontMatter.category || 'Uncategorized',
             tags: frontMatter.tags || [],

@@ -18,12 +18,13 @@
     <header>
         <div class="container">
             <nav>
-                <a href="index.html" class="nav-brand">Hamim</a>
+                <a href="/" class="nav-brand">Hamim</a>
                 <div class="nav-container">
                     <ul class="nav-links" id="nav-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li id="nav-categories"></li>
+                        <li><a href="/about/">About</a></li>
+                        <li><a href="/contact/">Contact</a></li>
                     </ul>
                     <div class="nav-controls">
                         <input type="text" id="search-input" placeholder="Search...">
@@ -36,25 +37,28 @@
     </header>
 
     <main class="container">
-        <p class="tagline">Question everything. Write it down.</p>
+        <div id="home-view">
+            <p class="tagline">Question everything. Write it down.</p>
 
-        <!-- Featured Section (Placeholder for latest) -->
-        <section id="featured-post" style="margin-bottom: var(--spacing-xl);">
-            <!-- Will be populated by JS if needed or hardcoded if specific -->
-        </section>
+            <!-- Featured Section (Placeholder for latest) -->
+            <section id="featured-post" style="margin-bottom: var(--spacing-xl);">
+                <!-- Will be populated by JS if needed or hardcoded if specific -->
+            </section>
 
-        <h2>All Articles</h2>
-        <div id="posts-container" class="article-grid">
-            <!-- Posts injected by JS -->
-            <p>Loading deep thoughts...</p>
+            <h2 id="main-heading">All Articles</h2>
+            <div id="posts-container" class="article-grid">
+                <!-- Posts injected by JS -->
+                <p>Loading deep thoughts...</p>
+            </div>
+
+            <div id="category-sections">
+                <!-- Category sections injected by JS -->
+            </div>
         </div>
 
-        <section style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
-            <h2>You Might Also Like</h2>
-            <div class="article-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <!-- Related posts injected by JS or similar logic -->
-            </div>
-        </section>
+        <article id="post-content" style="display: none;">
+            <!-- Content injected by scripts.js -->
+        </article>
     </main>
 
     <footer
@@ -62,11 +66,16 @@
         <div class="container">
             <h3 style="margin-bottom: 0.5rem;">Md Abu Bakkar Siddik Hamim</h3>
             <p>Question everything. Write it down.</p>
+
+            <div id="footer-categories" class="footer-sidebar">
+                <!-- Populated by JS -->
+            </div>
+
             <nav style="justify-content: center; margin-top: 2rem;">
                 <ul class="nav-links" style="gap: 2rem;">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about/">About</a></li>
+                    <li><a href="/contact/">Contact</a></li>
                 </ul>
             </nav>
             <p style="margin-top: 2rem; font-size: 0.875rem;">&copy; 2026 Md Abu Bakkar Siddik Hamim. All rights

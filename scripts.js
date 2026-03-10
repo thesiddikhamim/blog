@@ -1,6 +1,6 @@
 // Theme Management
 const themeToggle = document.getElementById('theme-toggle');
-const currentTheme = localStorage.getItem('theme') || 'dark'; // Use dark by default as per previous context or preference
+const currentTheme = localStorage.getItem('theme') || 'light'; // Default to light (white) theme
 
 function updateThemeIcon() {
     if (!themeToggle) return;
@@ -43,12 +43,75 @@ if (themeToggle) {
 const menuToggle = document.getElementById('menu-toggle');
 const navLinks = document.getElementById('nav-links');
 
-if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-    });
+// Create Overlay
+const overlay = document.createElement('div');
+overlay.className = 'nav-overlay';
+document.body.appendChild(overlay);
+
+function toggleMenu() {
+    const isActive = navLinks.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = isActive ? 'hidden' : '';
+
+    if (menuToggle) {
+        menuToggle.innerHTML = isActive
+            ? `<i data-lucide="x"></i>`
+            : `<i data-lucide="menu"></i>`;
+        if (window.lucide) window.lucide.createIcons();
+    }
 }
+
+if (menuToggle) {
+    menuToggle.innerHTML = `<i data-lucide="menu"></i>`;
+    menuToggle.addEventListener('click', toggleMenu);
+}
+
+overlay.addEventListener('click', toggleMenu);
+
+// Handle mobile category toggle and search
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Mobile Category Accordion
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900) {
+            const trigger = e.target.closest('.dropdown-trigger');
+            if (trigger) {
+                const dropdown = trigger.closest('.nav-dropdown');
+                if (dropdown) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('mobile-open');
+                }
+            }
+
+            // Close menu when clicking a link (except category trigger)
+            if (e.target.tagName === 'A' && !e.target.closest('.dropdown-trigger')) {
+                if (navLinks.classList.contains('active')) {
+                    toggleMenu();
+                }
+            }
+        }
+    });
+
+    // 2. Inject Mobile Search
+    if (window.innerWidth <= 900 && navLinks && !document.querySelector('.mobile-search')) {
+        const searchWrapper = document.createElement('div');
+        searchWrapper.className = 'mobile-search';
+        searchWrapper.innerHTML = `<input type="text" placeholder="Search articles..." id="mobile-search-input">`;
+        navLinks.prepend(searchWrapper);
+
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                // Reuse existing search logic by triggering input on main search
+                const mainSearch = document.getElementById('search-input');
+                if (mainSearch) {
+                    mainSearch.value = query;
+                    mainSearch.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+    }
+});
 
 // Relative Date Helper
 function getRelativeDate(dateString) {
@@ -69,29 +132,178 @@ let blogPosts = [];
 
 async function initBlog() {
     try {
-        const response = await fetch('posts.json');
+        const response = await fetch('/posts.json');
         blogPosts = await response.json();
 
-        // Initial render based on page
-        const path = window.location.pathname;
-        if (path.endsWith('index.html') || path === '/' || path.endsWith('/')) {
+        // 1. Always render global components
+        renderNavCategories();
+        renderFooterCategories();
+        updateThemeIcon();
+
+        // 2. Routing Logic
+        const params = new URLSearchParams(window.location.search);
+        const categoryFilter = params.get('category');
+
+        // Identify if a post slug is present (e.g. ?why-socialism)
+        // A slug is present if there is a search string that doesn't start with 'category' or 'id'
+        const firstParamKey = params.keys().next().value;
+        const isPostSlug = firstParamKey && firstParamKey !== 'category' && firstParamKey !== 'id';
+        const post = isPostSlug ? blogPosts.find(p => p.slug === firstParamKey) : null;
+
+        const homeView = document.getElementById('home-view');
+        const postView = document.getElementById('post-content');
+
+        if (post) {
+            // SHOW SINGLE POST
+            if (homeView) homeView.style.display = 'none';
+            if (postView) {
+                postView.style.display = 'block';
+                renderSinglePost(post);
+            }
+        } else if (categoryFilter) {
+            // SHOW CATEGORY FILTER
+            if (homeView) homeView.style.display = 'block';
+            if (postView) postView.style.display = 'none';
+            filterByCategory(categoryFilter, false);
+        } else {
+            // SHOW HOME PAGE
+            if (homeView) homeView.style.display = 'block';
+            if (postView) postView.style.display = 'none';
             renderFeaturedPost(blogPosts[0]);
             renderPosts(blogPosts.slice(1));
-        } else if (path.endsWith('post.html')) {
-            renderSinglePost();
+            renderCategorySections();
         }
+
     } catch (error) {
         console.error('Error loading blog posts:', error);
     }
 }
 
+function renderNavCategories() {
+    const navCategories = document.getElementById('nav-categories');
+    if (!navCategories) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+
+    if (categories.length > 0) {
+        navCategories.innerHTML = `
+            <div class="nav-dropdown">
+                <button class="dropdown-trigger">Categories <i data-lucide="chevron-down"></i></button>
+                <div class="dropdown-content">
+                    ${categories.map(cat => `<a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a>`).join('')}
+                </div>
+            </div>
+        `;
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+}
+
+function renderCategorySections() {
+    const container = document.getElementById('category-sections');
+    if (!container) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+
+    container.innerHTML = categories.map(category => {
+        const categoryPosts = blogPosts.filter(post => post.category === category).slice(0, 3);
+        const categoryId = `category-${category.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-')}`;
+
+        return `
+            <section id="${categoryId}" class="category-section" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 0;">${category}</h2>
+                    <a href="/index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
+                </div>
+                <div class="article-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    ${categoryPosts.map(post => `
+                        <article class="article-card">
+                            <a href="?${post.slug}">
+                                <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
+                                <h3>${post.title}</h3>
+                                <p style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${post.excerpt}</p>
+                            </a>
+                        </article>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }).join('');
+}
+
+
+
+function renderFooterCategories() {
+    const footerContainer = document.getElementById('footer-categories');
+    if (!footerContainer) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+    if (categories.length > 0) {
+        footerContainer.innerHTML = `
+            <h3>Categories</h3>
+            <ul class="footer-category-list">
+                ${categories.map(cat => `<li><a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
+            </ul>
+        `;
+    }
+}
+
+window.filterByCategory = function (category, shouldScroll = true) {
+    const postsContainer = document.getElementById('posts-container');
+    const homeView = document.getElementById('home-view');
+    const postView = document.getElementById('post-content');
+    const featuredSection = document.getElementById('featured-post');
+    const categorySections = document.getElementById('category-sections');
+    const allArticlesHeader = document.getElementById('main-heading');
+
+    // If we're not on the listing page (index.html), redirect to it
+    if (!postsContainer) {
+        window.location.href = `/index.html?category=${encodeURIComponent(category)}`;
+        return;
+    }
+
+    // Switch views if we are on a post page
+    if (homeView) homeView.style.display = 'block';
+    if (postView) postView.style.display = 'none';
+
+    if (featuredSection) featuredSection.style.display = 'none';
+    if (categorySections) categorySections.style.display = 'none';
+    if (allArticlesHeader) {
+        allArticlesHeader.textContent = category;
+    }
+
+    const filtered = blogPosts.filter(post => post.category === category);
+    renderPosts(filtered);
+
+    // Update URL state
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('category') !== category) {
+        const newUrl = window.location.pathname + '?category=' + encodeURIComponent(category);
+        window.history.pushState({ category: category }, '', newUrl);
+    }
+
+    // Scroll to the top of the filtered items
+    if (shouldScroll) {
+        const scrollTarget = allArticlesHeader || postsContainer;
+        if (scrollTarget) {
+            window.scrollTo({ top: scrollTarget.offsetTop - 120, behavior: 'smooth' });
+        }
+    }
+};
+
 function renderPosts(posts) {
     const container = document.getElementById('posts-container');
     if (!container) return;
 
+    if (posts.length === 0) {
+        container.innerHTML = '<p>No articles found for this selection.</p>';
+        return;
+    }
+
     container.innerHTML = posts.map(post => `
         <article class="article-card">
-            <a href="post.html?id=${post.id}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
@@ -102,15 +314,8 @@ function renderPosts(posts) {
     `).join('');
 }
 
-function renderSinglePost() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get('id'));
-    const post = blogPosts.find(p => p.id === id);
-
-    if (!post) {
-        document.getElementById('post-content').innerHTML = '<h1>Post not found</h1>';
-        return;
-    }
+function renderSinglePost(post) {
+    if (!post) return;
 
     document.title = `${post.title} | Md Abu Bakkar Siddik Hamim`;
 
@@ -122,7 +327,7 @@ function renderSinglePost() {
                 <h1 class="post-title">${post.title}</h1>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
-                        <img src="photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div>
                         <strong>Md Abu Bakkar Siddik Hamim</strong><br>
@@ -205,7 +410,7 @@ function renderRelatedPosts(currentPost) {
 
     return related.map(post => `
         <article class="article-card">
-            <a href="post.html?id=${post.id}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 4/3;">
                 <h3>${post.title}</h3>
             </a>
@@ -219,15 +424,15 @@ function renderFeaturedPost(post) {
 
     container.innerHTML = `
         <article class="featured-card">
-            <a href="post.html?id=${post.id}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
             </a>
             <div>
                 <span class="accent-tag">${post.category}</span>
-                <h2><a href="post.html?id=${post.id}">${post.title}</a></h2>
+                <h2><a href="?${post.slug}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
-                    <img src="photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
+                    <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
                     <small>By Md Abu Bakkar Siddik Hamim • ${getRelativeDate(post.date)}</small>
                 </div>
             </div>
@@ -240,12 +445,24 @@ const searchInput = document.getElementById('search-input');
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
+        const homeView = document.getElementById('home-view');
+        const postView = document.getElementById('post-content');
         const featuredSection = document.getElementById('featured-post');
+        const categorySections = document.getElementById('category-sections');
+        const allArticlesHeader = document.querySelector('h2');
 
         if (query.trim() !== '') {
+            // Switch views to show results
+            if (homeView) homeView.style.display = 'block';
+            if (postView) postView.style.display = 'none';
+
             if (featuredSection) featuredSection.style.display = 'none';
+            if (categorySections) categorySections.style.display = 'none';
+            if (allArticlesHeader) allArticlesHeader.textContent = 'Search Results';
         } else {
             if (featuredSection) featuredSection.style.display = 'block';
+            if (categorySections) categorySections.style.display = 'block';
+            if (allArticlesHeader) allArticlesHeader.textContent = 'All Articles';
         }
 
         const filtered = blogPosts.filter(post =>

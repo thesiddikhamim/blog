@@ -1,0 +1,15 @@
+{
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/posts",
+            "destination": "/posts.json"
+        }
+  ],
+    "builds": [
+        {
+            "src": "**",
+            "use": "@vercel/static"
+        }
+    ]
+}
