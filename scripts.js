@@ -53,6 +53,13 @@ function toggleMenu() {
     overlay.classList.toggle('active');
     document.body.style.overflow = isActive ? 'hidden' : '';
 
+    if (!isActive) {
+        // Reset any open dropdowns when closing the menu
+        document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('mobile-open');
+        });
+    }
+
     if (menuToggle) {
         menuToggle.innerHTML = isActive
             ? `<i data-lucide="x"></i>`

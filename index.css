@@ -423,8 +423,8 @@ nav {
         top: 0;
         right: -100%;
         /* Off-screen */
-        width: 85%;
-        max-width: 320px;
+        width: 100%;
+        max-width: none;
         height: 100vh;
         background: var(--bg-primary);
         flex-direction: column;
@@ -479,6 +479,10 @@ nav {
         padding: 0.5rem 0 0.5rem 1rem;
         margin-top: 0;
         background: transparent;
+    }
+
+    .nav-dropdown:hover .dropdown-content {
+        display: none;
     }
 
     .nav-dropdown.mobile-open .dropdown-content {
