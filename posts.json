@@ -58,21 +58,6 @@
         "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
     },
     {
-        "id": 4,
-        "slug": "existentialism-and-the-search-for-meaning",
-        "title": "Existentialism and the Search for Meaning",
-        "category": "Philosophy & Ideas",
-        "tags": [
-            "Philosophy",
-            "Existentialism",
-            "Ethics"
-        ],
-        "date": "2026-02-15T15:30:00Z",
-        "excerpt": "Sartre, Camus, and the burden of absolute freedom in a world that offers no inherent purpose.",
-        "content": "Existentialism is often misunderstood as a philosophy of despair. In reality, it is a philosophy of radical responsibility. Jean-Paul Sartre argued that 'existence precedes essence,' meaning we are not born with a predefined purpose but must create our own through our choices. <br><br>This freedom can be staggering, leading to what Kierkegaard called 'dread.' Yet, it is also the source of our dignity. To live authentically is to embrace this freedom and take full ownership of the meaning we carve out for ourselves.",
-        "image": "https://images.unsplash.com/photo-1499244015948-ac7565d4bbaa?auto=format&fit=crop&w=800&q=80"
-    },
-    {
         "id": 5,
         "slug": "the-rise-of-green-protectionism",
         "title": "The Rise of Green Protectionism",
