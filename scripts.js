@@ -132,7 +132,7 @@ let blogPosts = [];
 
 async function initBlog() {
     try {
-        const response = await fetch('posts.json');
+        const response = await fetch('/posts.json');
         blogPosts = await response.json();
 
         // 1. Always render global components
@@ -190,7 +190,7 @@ function renderNavCategories() {
             <div class="nav-dropdown">
                 <button class="dropdown-trigger">Categories <i data-lucide="chevron-down"></i></button>
                 <div class="dropdown-content">
-                    ${categories.map(cat => `<a href="index.html?category=${encodeURIComponent(cat)}">${cat}</a>`).join('')}
+                    ${categories.map(cat => `<a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a>`).join('')}
                 </div>
             </div>
         `;
@@ -214,7 +214,7 @@ function renderCategorySections() {
             <section id="${categoryId}" class="category-section" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
                     <h2 style="margin-bottom: 0;">${category}</h2>
-                    <a href="index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
+                    <a href="/index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
                 </div>
                 <div class="article-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                     ${categoryPosts.map(post => `
@@ -243,7 +243,7 @@ function renderFooterCategories() {
         footerContainer.innerHTML = `
             <h3>Categories</h3>
             <ul class="footer-category-list">
-                ${categories.map(cat => `<li><a href="index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
+                ${categories.map(cat => `<li><a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
             </ul>
         `;
     }
@@ -251,16 +251,21 @@ function renderFooterCategories() {
 
 window.filterByCategory = function (category, shouldScroll = true) {
     const postsContainer = document.getElementById('posts-container');
-
-    // If we're not on the listing page (index.html), redirect to it
-    if (!postsContainer) {
-        window.location.href = `index.html?category=${encodeURIComponent(category)}`;
-        return;
-    }
-
+    const homeView = document.getElementById('home-view');
+    const postView = document.getElementById('post-content');
     const featuredSection = document.getElementById('featured-post');
     const categorySections = document.getElementById('category-sections');
     const allArticlesHeader = document.getElementById('main-heading');
+
+    // If we're not on the listing page (index.html), redirect to it
+    if (!postsContainer) {
+        window.location.href = `/index.html?category=${encodeURIComponent(category)}`;
+        return;
+    }
+
+    // Switch views if we are on a post page
+    if (homeView) homeView.style.display = 'block';
+    if (postView) postView.style.display = 'none';
 
     if (featuredSection) featuredSection.style.display = 'none';
     if (categorySections) categorySections.style.display = 'none';
@@ -440,11 +445,17 @@ const searchInput = document.getElementById('search-input');
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
+        const homeView = document.getElementById('home-view');
+        const postView = document.getElementById('post-content');
         const featuredSection = document.getElementById('featured-post');
         const categorySections = document.getElementById('category-sections');
         const allArticlesHeader = document.querySelector('h2');
 
         if (query.trim() !== '') {
+            // Switch views to show results
+            if (homeView) homeView.style.display = 'block';
+            if (postView) postView.style.display = 'none';
+
             if (featuredSection) featuredSection.style.display = 'none';
             if (categorySections) categorySections.style.display = 'none';
             if (allArticlesHeader) allArticlesHeader.textContent = 'Search Results';
