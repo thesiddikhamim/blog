@@ -1,3 +1,38 @@
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-BoldItalic.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-BlackItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Denton Condensed Test';
+    src: url('font/DentonCondensedTest-ExtraBold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+
 :root {
     /* Color Palette - Light Mode */
     --bg-primary: #ffffff;
@@ -11,7 +46,7 @@
     --selection-text: #111111;
 
     /* Typography */
-    --font-heading: 'Playfair Display', serif;
+    --font-heading: 'Denton Condensed Test', serif;
     --font-body: 'Source Serif 4', serif;
 
     /* Spacing */
