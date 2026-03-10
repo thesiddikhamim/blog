@@ -1,3 +1,11 @@
+// Prevent all text selection and contextual menus on mobile Chrome
+document.addEventListener('selectionchange', () => {
+    const selection = window.getSelection();
+    if (selection.toString().length > 0) {
+        selection.removeAllRanges();
+    }
+});
+
 // Theme Management
 const themeToggle = document.getElementById('theme-toggle');
 const currentTheme = localStorage.getItem('theme') || 'light'; // Default to light (white) theme
