@@ -94,24 +94,7 @@ body {
     user-select: none;
 }
 
-.article-body,
-.content-narrow,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-.post-content,
-.featured-card p,
-.article-card p,
-.tagline,
-footer p {
-    -webkit-user-select: text;
-    user-select: text;
-}
+/* Text selection is disabled by default on body to prevent accidental selection on mobile. */
 
 #menu-toggle {
     -webkit-user-select: none;
