@@ -12,123 +12,457 @@
         rel="stylesheet">
     <link rel="stylesheet" href="index.css">
     <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.03);
+            --accent-hover: #b47a04;
+        }
+
+        [data-theme="dark"] {
+            --glass-bg: rgba(30, 30, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        body {
+            background: var(--bg-secondary);
+        }
+
+        /* Admin Header */
         .admin-header {
-            padding: 4rem 0 2rem 0;
+            padding: 4rem 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             border-bottom: 1px solid var(--border);
             margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .admin-grid {
+        .admin-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 50%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(202, 138, 4, 0.05) 0%, transparent 70%);
+            transform: rotate(-15deg);
+        }
+
+        .admin-header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 5rem 2rem;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
         }
 
-        .upload-container {
-            background: var(--bg-secondary);
-            padding: 3rem;
-            border: 2px dashed var(--border);
+        .stat-card {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
             text-align: center;
+            box-shadow: var(--shadow-premium);
             transition: all 0.3s ease;
-            position: sticky;
-            top: 100px;
         }
 
-        .upload-container.dragover {
+        .stat-card:hover {
+            transform: translateY(-5px);
             border-color: var(--accent);
-            background: rgba(0, 0, 0, 0.05);
         }
 
-        .file-input {
-            display: none;
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
         }
 
-        .btn-primary {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            padding: 0.75rem 1.5rem;
-            border: none;
-            font-family: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-            display: inline-block;
+        .stat-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
+        /* Post Management List */
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
         }
 
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-            padding: 0.4rem 0.8rem;
+        .post-card {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent);
+        }
+
+        .post-card-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background: var(--bg-secondary);
+        }
+
+        .post-card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .post-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .post-id {
             font-size: 0.75rem;
-            border: none;
-            cursor: pointer;
-        }
-
-        #status-message {
-            margin-top: 2rem;
-            padding: 1rem;
-            display: none;
-        }
-
-        .success {
-            color: #2ecc71;
-        }
-
-        .error {
-            color: #e74c3c;
-        }
-
-        .file-list {
-            text-align: left;
-            margin-top: 2rem;
-            font-size: 0.875rem;
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
             color: var(--text-secondary);
         }
 
-        .posts-list {
-            list-style: none;
+        .post-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .post-management-item {
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .btn-icon {
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+
+        .btn-icon:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-icon.delete:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 3rem;
+            right: 7rem;
+            /* To the left of theme toggle */
+            width: 4rem;
+            height: 4rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(202, 138, 4, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: var(--accent-hover);
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 1.5rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
         }
 
-        .post-management-info h4 {
-            margin-bottom: 0.25rem;
-            font-size: 1rem;
+        .modal-body {
+            padding: 2rem 2rem 10rem 2rem;
+            overflow-y: visible;
+            flex-grow: 1;
         }
 
-        .post-management-info small {
+        /* Ensure modal itself can scroll if body content is too long */
+        .modal-content {
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
-        .post-link {
-            text-decoration: none;
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 4px rgba(202, 138, 4, 0.1);
+        }
+
+        /* Tags and Category Selector */
+        .selector-field {
+            position: relative;
+        }
+
+        .selector-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: var(--shadow-premium);
+            display: none;
+            margin-top: 4px;
+        }
+
+        .selector-field.active .selector-options {
+            display: block;
+        }
+
+        .option-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            background: var(--bg-secondary);
+            color: var(--accent);
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .tag-pill {
+            background: var(--selection-bg);
+            color: var(--selection-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tag-pill button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
             color: inherit;
-            flex-grow: 1;
-            transition: opacity 0.2s;
         }
 
-        .post-link:hover {
-            opacity: 0.7;
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
-        @media (max-width: 900px) {
-            .admin-grid {
-                grid-template-columns: 1fr;
-            }
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(202, 138, 4, 0.05);
+        }
 
-            .upload-container {
-                position: static;
-            }
+        .upload-zone i {
+            display: block;
+            margin: 0 auto 1rem auto;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        /* Notifications */
+        #notification-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+        }
+
+        .notification {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .notification.active {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left-color: #10b981;
+        }
+
+        .notification.error {
+            border-left-color: #ef4444;
         }
     </style>
 </head>
@@ -140,6 +474,7 @@
                 <a href="index.html" class="nav-brand">Hamim</a>
                 <ul class="nav-links">
                     <li><a href="index.html">View Site</a></li>
+                    <li><a href="admin.html" class="accent-tag" style="margin: 0;">Dashboard</a></li>
                 </ul>
                 <div class="nav-controls">
                     <button id="theme-toggle" title="Toggle Dark/Light Mode"></button>
@@ -148,111 +483,314 @@
         </div>
     </header>
 
-    <main class="container">
-        <section class="admin-header">
-            <h1>Admin Dashboard</h1>
-            <p>Manage your writings and publish new articles.</p>
-        </section>
+    <main>
+        <div class="admin-header">
+            <div class="container">
+                <h1>Control Center</h1>
+                <p>Manage your intellectual properties and publish new works.</p>
+            </div>
+        </div>
 
-        <div class="admin-grid">
-            <!-- Upload Section -->
-            <section class="upload-section">
-                <h2>Publish New Article</h2>
-                <div id="drop-zone" class="upload-container">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
-                        stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    <h3>Drag & Drop Files</h3>
-                    <p>Upload <strong>.md</strong> and all images (including cover).</p>
-                    <input type="file" id="file-input" class="file-input" multiple accept=".md,image/*">
-                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Select
-                        Files</button>
-                    <div id="file-list" class="file-list"></div>
+        <div class="dashboard-container">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="stat-total-posts">0</h3>
+                    <p>Total Writings</p>
                 </div>
+                <div class="stat-card">
+                    <h3 id="stat-total-categories">0</h3>
+                    <p>Categories</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-total-tags">0</h3>
+                    <p>Unique Tags</p>
+                </div>
+            </div>
 
-                <div style="text-align: center; margin-top: 2rem;">
-                    <button id="publish-btn" class="btn-primary"
-                        style="display: none; background: var(--accent); color: white;">Publish Article</button>
-                    <div id="status-message"></div>
+            <!-- Posts List Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>All Writings</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="selector-field" style="width: 200px;">
+                        <input type="text" id="post-search" class="form-control" placeholder="Search by title...">
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Management Section -->
-            <section class="management-section">
-                <h2>Your Writings</h2>
-                <div id="posts-list-container" class="posts-list">
-                    <p>Loading writings...</p>
-                </div>
-            </section>
+            <!-- Posts List Container -->
+            <div id="posts-grid" class="post-grid">
+                <p>Curating your work...</p>
+            </div>
         </div>
     </main>
 
+    <!-- FAB -->
+    <button class="fab" id="open-upload" title="Publish New Article">
+        <i data-lucide="plus"></i>
+    </button>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="upload-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Publish New Article</h3>
+                <button class="btn-icon" onclick="closeModal('upload-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-zone" id="drop-zone">
+                    <i data-lucide="upload-cloud" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                    <h4>Drag & Drop Files</h4>
+                    <p>Upload your <strong>.md</strong> file and all associated <strong>images</strong>.</p>
+                    <input type="file" id="file-input" style="display: none;" multiple accept=".md,image/*">
+                    <button class="btn" style="margin-top: 1rem;"
+                        onclick="document.getElementById('file-input').click()">Browse Files</button>
+                    <div id="selected-files-list"
+                        style="margin-top: 2rem; text-align: left; font-size: 0.85rem; color: var(--text-secondary);">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('upload-modal')">Cancel</button>
+                <button class="btn" id="publish-btn"
+                    style="background: var(--accent); color: white; border: none; display: none;">Publish
+                    Work</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Writing Metadata</h3>
+                <button class="btn-icon" onclick="closeModal('edit-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form" onsubmit="return false;">
+                    <input type="hidden" id="edit-post-id">
+                    <div class="form-group">
+                        <label for="edit-title">Title</label>
+                        <input type="text" id="edit-title" class="form-control" required>
+                    </div>
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="edit-slug">Slug</label>
+                            <input type="text" id="edit-slug" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-date">Date</label>
+                            <input type="datetime-local" id="edit-date" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category (Click to see existing)</label>
+                        <div class="selector-field" id="category-selector-wrapper">
+                            <div style="position: relative;">
+                                <input type="text" id="edit-category" class="form-control"
+                                    placeholder="Type to search or create..." autocomplete="off">
+                                <i data-lucide="chevron-down"
+                                    style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; opacity: 0.5; width: 16px;"></i>
+                            </div>
+                            <div class="selector-options" id="category-options"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (Select existing or type and press Enter)</label>
+                        <div class="selector-field" id="tag-selector-wrapper">
+                            <div style="position: relative;">
+                                <input type="text" id="tag-input" class="form-control" placeholder="Add tags..."
+                                    autocomplete="off">
+                                <i data-lucide="tag"
+                                    style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; opacity: 0.5; width: 16px;"></i>
+                            </div>
+                            <div class="selector-options" id="tag-options"></div>
+                        </div>
+                        <div id="edit-tags-container" class="selected-tags"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-excerpt">Excerpt</label>
+                        <textarea id="edit-excerpt" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-image">Hero Image Path</label>
+                        <input type="text" id="edit-image" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('edit-modal')">Discard</button>
+                <button class="btn" id="save-edit-btn"
+                    style="background: var(--accent); color: white; border: none;">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification-container"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
+        // Global State
+        let allPosts = [];
+        let categories = [];
+        let tags = [];
+        let selectedUploadFiles = [];
+        let editingTags = [];
+
+        // UI Elements
+        const postsGrid = document.getElementById('posts-grid');
+        const uploadModal = document.getElementById('upload-modal');
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-form');
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
-        const fileList = document.getElementById('file-list');
         const publishBtn = document.getElementById('publish-btn');
-        const statusMessage = document.getElementById('status-message');
-        const postsListContainer = document.getElementById('posts-list-container');
+        const searchInput = document.getElementById('post-search');
 
-        let selectedFiles = [];
+        // Form specific elements
+        const categoryInput = document.getElementById('edit-category');
+        const categoryOptions = document.getElementById('category-options');
+        const categoryWrapper = document.getElementById('category-selector-wrapper');
+        const tagInput = document.getElementById('tag-input');
+        const tagOptions = document.getElementById('tag-options');
+        const tagWrapper = document.getElementById('tag-selector-wrapper');
 
-        // Initial Load of Posts
-        async function loadPosts() {
+        // Initialization
+        async function init() {
             try {
-                const url = '/posts';
-                console.log('Fetching:', url);
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Fetch failed: ' + response.statusText + ' at ' + response.url);
-                const posts = await response.json();
-                renderPostsList(posts);
-            } catch (error) {
-                console.error('loadPosts error:', error);
-                postsListContainer.innerHTML = `<p class="error">Error loading writings: ${error.message}</p>`;
+                await Promise.all([
+                    refreshData(),
+                    loadCategories(),
+                    loadTags()
+                ]);
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Initialization failed:', err);
             }
         }
 
-        function renderPostsList(posts) {
+        async function refreshData() {
+            try {
+                const response = await fetch('/posts');
+                allPosts = await response.json();
+                renderPosts(allPosts);
+                updateStats();
+            } catch (error) {
+                notify('Failed to load posts', 'error');
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/categories');
+                categories = await response.json();
+                console.log('Categories loaded:', categories);
+                renderCategoryOptions();
+            } catch (err) {
+                console.error('Failed to load categories:', err);
+            }
+        }
+
+        async function loadTags() {
+            try {
+                const response = await fetch('/tags');
+                tags = await response.json();
+                console.log('Tags loaded:', tags);
+                renderTagOptions();
+            } catch (err) {
+                console.error('Failed to load tags:', err);
+            }
+        }
+
+        console.log('Admin JS initialized');
+
+        function updateStats() {
+            document.getElementById('stat-total-posts').textContent = allPosts.length;
+            document.getElementById('stat-total-categories').textContent = [...new Set(allPosts.map(p => p.category))].length;
+            document.getElementById('stat-total-tags').textContent = [...new Set(allPosts.flatMap(p => p.tags))].length;
+        }
+
+        // Rendering
+        function renderPosts(posts) {
             if (posts.length === 0) {
-                postsListContainer.innerHTML = '<p>No writings yet.</p>';
+                postsGrid.innerHTML = '<p>No writings found.</p>';
                 return;
             }
 
-            postsListContainer.innerHTML = posts.map(post => `
-                <div class="post-management-item">
-                    <a href="post.html?id=${post.id}" target="_blank" class="post-link">
-                        <div class="post-management-info">
-                            <h4>#${post.id}: ${post.title}</h4>
-                            <small>${post.category} • ${new Date(post.date).toLocaleDateString()}</small>
+            postsGrid.innerHTML = posts.map((post, index) => `
+                <div class="post-card fade-in-up" style="animation-delay: ${index * 0.05}s">
+                    <img src="${post.image || 'https://via.placeholder.com/800x450?text=No+Cover'}" class="post-card-img" alt="${post.title}">
+                    <div class="post-card-content">
+                        <div class="post-card-header">
+                            <span class="post-id">#${post.id}</span>
+                            <span class="accent-tag" style="margin: 0; font-size: 0.65rem;">${post.category}</span>
                         </div>
-                    </a>
-                    <button class="btn-delete" onclick="deletePost(${post.id})">Delete</button>
+                        <h4>${post.title}</h4>
+                        <div class="post-meta">
+                            <i data-lucide="calendar" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                            ${new Date(post.date).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn-icon" onclick="openEditModal(${post.id})" title="Edit Metadata">
+                            <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <a href="/index.html?${post.slug}" target="_blank" class="btn-icon" title="View Published">
+                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                        </a>
+                        <div style="flex-grow: 1;"></div>
+                        <button class="btn-icon delete" onclick="handleDelete(${post.id})" title="Delete Post">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
+            lucide.createIcons();
         }
 
-        async function deletePost(id) {
-            if (!confirm('Are you sure you want to delete this writing?')) return;
+        // Search
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allPosts.filter(p =>
+                p.title.toLowerCase().includes(query) ||
+                p.category.toLowerCase().includes(query)
+            );
+            renderPosts(filtered);
+        });
 
-            try {
-                const response = await fetch(`/posts/${id}`, {
-                    method: 'DELETE'
-                });
-                const result = await response.json();
-                if (result.success) {
-                    loadPosts();
-                }
-            } catch (error) {
-                alert('Delete failed.');
-            }
+        // Modals
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
         }
 
-        // Drag & Drop Handlers
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        document.getElementById('open-upload').addEventListener('click', () => {
+            selectedUploadFiles = [];
+            document.getElementById('selected-files-list').innerHTML = '';
+            publishBtn.style.display = 'none';
+            openModal('upload-modal');
+        });
+
+        // Upload Logic
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, preventDefaults, false);
         });
 
         function preventDefaults(e) {
@@ -260,85 +798,257 @@
             e.stopPropagation();
         }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        ['dragenter', 'dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
         });
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        ['dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
         });
 
-        dropZone.addEventListener('drop', handleDrop, false);
-        fileInput.addEventListener('change', (e) => handleFiles(e.target.files), false);
-
-        function handleDrop(e) {
-            handleFiles(e.dataTransfer.files);
-        }
+        dropZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
         function handleFiles(files) {
-            // Reset for new selection if desired, or append
-            selectedFiles = [...selectedFiles, ...Array.from(files)];
-            updateFileList();
+            selectedUploadFiles = [...selectedUploadFiles, ...Array.from(files)];
+            document.getElementById('selected-files-list').innerHTML =
+                '<strong>Selected Assets:</strong><br>' +
+                selectedUploadFiles.map(f => `<span style="display: block; margin: 4px 0;">• ${f.name} (${(f.size / 1024).toFixed(1)} KB)</span>`).join('');
             publishBtn.style.display = 'inline-block';
         }
 
-        function updateFileList() {
-            fileList.innerHTML = '<strong>Files selected:</strong><br>' +
-                selectedFiles.map(f => `• ${f.name}`).join('<br>');
-        }
-
         publishBtn.addEventListener('click', async () => {
-            const markdownFile = selectedFiles.find(f => f.name.endsWith('.md'));
-            const images = selectedFiles.filter(f => !f.name.endsWith('.md'));
-
-            if (!markdownFile) {
-                showStatus('Please include a .md file.', 'error');
+            const mdFile = selectedUploadFiles.find(f => f.name.endsWith('.md'));
+            if (!mdFile) {
+                notify('Markdown (.md) file is required', 'error');
                 return;
             }
 
             const formData = new FormData();
-            formData.append('markdown', markdownFile);
-            images.forEach(img => formData.append('images', img));
+            formData.append('markdown', mdFile);
+            selectedUploadFiles.filter(f => !f.name.endsWith('.md')).forEach(f => formData.append('images', f));
 
             try {
                 publishBtn.disabled = true;
                 publishBtn.textContent = 'Publishing...';
 
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch('/upload', { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.success) {
-                    showStatus('Published successfully!', 'success');
-                    selectedFiles = [];
-                    updateFileList();
-                    publishBtn.style.display = 'none';
-                    loadPosts(); // Refresh list
+                    notify('Great! Your work is now live.', 'success');
+                    closeModal('upload-modal');
+                    refreshData();
+                    loadCategories();
+                    loadTags();
                 } else {
-                    showStatus('Error: ' + result.message, 'error');
+                    notify(result.message || 'Something went wrong', 'error');
                 }
-            } catch (error) {
-                showStatus('Upload failed. Is the server running?', 'error');
+            } catch (err) {
+                notify('Connection error', 'error');
             } finally {
                 publishBtn.disabled = false;
-                publishBtn.textContent = 'Publish Article';
+                publishBtn.textContent = 'Publish Work';
             }
         });
 
-        function showStatus(msg, type) {
-            statusMessage.textContent = msg;
-            statusMessage.style.display = 'block';
-            statusMessage.className = type;
-            setTimeout(() => statusMessage.style.display = 'none', 5000);
+        // Delete Logic
+        async function handleDelete(id) {
+            if (!confirm('Are you sure you want to delete this writing? This cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`/posts/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) {
+                    notify('Post deleted successfully', 'success');
+                    refreshData();
+                }
+            } catch (err) {
+                notify('Failed to delete', 'error');
+            }
         }
 
-        // Initialize
-        loadPosts();
+        // Edit Modal Logic
+        async function openEditModal(id) {
+            const post = allPosts.find(p => p.id === id);
+            if (!post) return;
+
+            // Fresh data before editing
+            await Promise.all([loadCategories(), loadTags()]);
+
+            document.getElementById('edit-post-id').value = post.id;
+            document.getElementById('edit-title').value = post.title;
+            document.getElementById('edit-slug').value = post.slug;
+            document.getElementById('edit-date').value = new Date(post.date).toISOString().slice(0, 16);
+            document.getElementById('edit-category').value = post.category;
+            document.getElementById('edit-excerpt').value = post.excerpt;
+            document.getElementById('edit-image').value = post.image;
+
+            editingTags = [...(post.tags || [])];
+            renderEditingTags();
+            openModal('edit-modal');
+        }
+
+        function renderCategoryOptions(filter = '', showFullIfEmptyFilter = false) {
+            const val = filter.toLowerCase();
+            // If showFullIfEmptyFilter is true and filter isn't empty, we still filter.
+            // But if we want to show all on click, we pass empty filter.
+            const filtered = val ? categories.filter(c => c.toLowerCase().includes(val)) : categories;
+            const items = filtered.length ? filtered : (val ? [filter] : categories);
+
+            categoryOptions.innerHTML = items.map(cat => `
+                <div class="option-item" onclick="selectCategory('${cat.replace(/'/g, "\\'")}')">${cat}</div>
+            `).join('');
+
+            if (items.length === 0 && !val) {
+                categoryOptions.innerHTML = '<div class="option-item" style="opacity: 0.5; cursor: default;">No categories found. Type to create.</div>';
+            }
+        }
+
+        window.selectCategory = function (cat) {
+            categoryInput.value = cat;
+            categoryWrapper.classList.remove('active');
+        };
+
+        categoryInput.addEventListener('focus', () => {
+            renderCategoryOptions(''); // Show all on focus
+            categoryWrapper.classList.add('active');
+        });
+
+        categoryInput.addEventListener('click', (e) => {
+            renderCategoryOptions(''); // Show all on click
+            categoryWrapper.classList.add('active');
+            e.stopPropagation();
+        });
+
+        categoryInput.addEventListener('input', () => {
+            renderCategoryOptions(categoryInput.value);
+            categoryWrapper.classList.add('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!categoryWrapper.contains(e.target)) categoryWrapper.classList.remove('active');
+            if (!tagWrapper.contains(e.target)) tagWrapper.classList.remove('active');
+        });
+
+        // Tag Selector already defined at top
+
+        tagInput.addEventListener('focus', () => {
+            renderTagOptions(''); // Show all available on focus
+            tagWrapper.classList.add('active');
+        });
+
+        // Removed duplicate click listener logic to clean up
+
+        function renderTagOptions(filter = '') {
+            const val = filter.toLowerCase();
+            const filtered = val ? tags.filter(t => t.toLowerCase().includes(val)) : tags;
+            // Only show tags not already selected
+            const available = filtered.filter(t => !editingTags.includes(t));
+
+            tagOptions.innerHTML = available.map(tag => `
+                <div class="option-item" onclick="addTag('${tag.replace(/'/g, "\\'")}')">${tag}</div>
+            `).join('');
+
+            if (available.length === 0) {
+                tagOptions.innerHTML = `<div class="option-item" style="opacity: 0.5; cursor: default;">${filter ? "Press Enter to create '" + filter + "'" : "No more tags available"}</div>`;
+            }
+        }
+
+        window.addTag = function (tag) {
+            if (!editingTags.includes(tag)) {
+                editingTags.push(tag);
+                renderEditingTags();
+            }
+            tagInput.value = '';
+            tagWrapper.classList.remove('active');
+        };
+
+        tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = tagInput.value.trim();
+                if (val) addTag(val);
+                return false;
+            }
+        });
+
+        tagInput.addEventListener('click', (e) => {
+            renderTagOptions(''); // Show all available on click
+            tagWrapper.classList.add('active');
+            e.stopPropagation();
+        });
+
+        tagInput.addEventListener('input', () => {
+            renderTagOptions(tagInput.value);
+            tagWrapper.classList.add('active');
+        });
+
+        function renderEditingTags() {
+            const container = document.getElementById('edit-tags-container');
+            container.innerHTML = editingTags.map(tag => `
+                <span class="tag-pill">${tag} <button type="button" onclick="removeTag('${tag}')"><i data-lucide="x" style="width: 14px;"></i></button></span>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.removeTag = function (tag) {
+            editingTags = editingTags.filter(t => t !== tag);
+            renderEditingTags();
+        };
+
+        // Save Edit
+        document.getElementById('save-edit-btn').addEventListener('click', async () => {
+            const id = document.getElementById('edit-post-id').value;
+            const updatedPost = {
+                title: document.getElementById('edit-title').value,
+                slug: document.getElementById('edit-slug').value,
+                date: new Date(document.getElementById('edit-date').value).toISOString(),
+                category: document.getElementById('edit-category').value,
+                excerpt: document.getElementById('edit-excerpt').value,
+                image: document.getElementById('edit-image').value,
+                tags: editingTags
+            };
+
+            try {
+                const response = await fetch(`/posts/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedPost)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    notify('Changes saved', 'success');
+                    closeModal('edit-modal');
+                    refreshData();
+                    loadCategories();
+                    loadTags();
+                }
+            } catch (err) {
+                notify('Failed to save', 'error');
+            }
+        });
+
+        // Notifications Helper
+        function notify(msg, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const el = document.createElement('div');
+            el.className = `notification ${type}`;
+            el.innerHTML = `
+                <i class="lucide-${type === 'success' ? 'check-circle' : 'alert-circle'}"></i>
+                <span>${msg}</span>
+            `;
+            container.appendChild(el);
+            setTimeout(() => el.classList.add('active'), 10);
+            setTimeout(() => {
+                el.classList.remove('active');
+                setTimeout(() => el.remove(), 400);
+            }, 4000);
+        }
+
+        // Run
+        init();
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="scripts.js"></script>
 </body>
 

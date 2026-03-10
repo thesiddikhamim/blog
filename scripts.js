@@ -308,7 +308,7 @@ function renderPosts(posts) {
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
                 <p>${post.excerpt}</p>
-                <small>${getRelativeDate(post.date)} • ${post.tags.join(', ')}</small>
+                <small>${getRelativeDate(post.date)} • ${post.tags ? post.tags.join(', ') : ''}</small>
             </a>
         </article>
     `).join('');
