@@ -333,11 +333,11 @@ function renderSinglePost(post) {
                 <span class="accent-tag">${post.category}</span>
                 <h1 class="post-title">${post.title}</h1>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden;">
+                    <a href="/about/" style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden; display: block;" title="About the Author">
                         <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
+                    </a>
                     <div>
-                        <strong>Md Abu Bakkar Siddik Hamim</strong><br>
+                        <a href="/about/" class="author-link" style="font-size: 1.1rem; display: block; margin-bottom: 0.2rem;">Md Abu Bakkar Siddik Hamim</a>
                         <small>${getRelativeDate(post.date)}</small>
                     </div>
                 </div>
@@ -439,8 +439,10 @@ function renderFeaturedPost(post) {
                 <h2><a href="?${post.slug}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
-                    <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
-                    <small>By Md Abu Bakkar Siddik Hamim • ${getRelativeDate(post.date)}</small>
+                    <a href="/about/">
+                        <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim">
+                    </a>
+                    <small>By <a href="/about/" class="author-link">Md Abu Bakkar Siddik Hamim</a> • ${getRelativeDate(post.date)}</small>
                 </div>
             </div>
         </article>
