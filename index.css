@@ -763,7 +763,7 @@ nav {
     font-size: 1.25rem;
     line-height: 1.8;
     color: var(--text-primary);
-    text-align: left;
+    text-align: justify;
     /* Changed from justify to prevent broken gaps on mobile */
     text-wrap: pretty;
     overflow-wrap: break-word;
