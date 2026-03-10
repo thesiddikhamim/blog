@@ -1,10 +1,23 @@
-// Prevent all text selection and contextual menus on mobile Chrome
-document.addEventListener('selectionchange', () => {
-    const selection = window.getSelection();
-    if (selection.toString().length > 0) {
-        selection.removeAllRanges();
+// Prevent Chrome "Touch to Search" popup
+// Must intercept at touchend — selectionchange fires too late
+(function () {
+    function clearSel() {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) sel.removeAllRanges();
     }
-});
+
+    // Clear selection the instant the finger lifts
+    document.addEventListener('touchend', clearSel, { passive: true });
+
+    // Clear selection after any mouse click (desktop safety)
+    document.addEventListener('mouseup', clearSel);
+
+    // Block the context menu entirely (right-click / long-press)
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Belt-and-suspenders: also clear on selectionchange
+    document.addEventListener('selectionchange', clearSel);
+})();
 
 // Theme Management
 const themeToggle = document.getElementById('theme-toggle');
