@@ -427,8 +427,11 @@ function renderRelatedPosts(currentPost) {
     return related.map(post => `
         <article class="article-card">
             <a href="?${post.slug}">
-                <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 4/3;">
+                <img src="${post.image}" alt="${post.title}" class="cover-image">
+                <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
+                <p>${post.excerpt}</p>
+                <small>${getRelativeDate(post.date)} • ${post.tags ? post.tags.join(', ') : ''}</small>
             </a>
         </article>
     `).join('');
