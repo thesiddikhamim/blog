@@ -752,10 +752,10 @@ nav {
     }
 
     .article-body {
-        font-size: 1.125rem;
-        line-height: 1.7;
-        letter-spacing: -0.012em;
-        /* Subtle compression to improve justification without hyphens */
+        font-size: 1.05rem;
+        /* Slightly smaller to fit more words strictly for justification */
+        line-height: 1.6;
+        letter-spacing: -0.01em;
     }
 }
 
@@ -766,9 +766,8 @@ nav {
     line-height: 1.8;
     color: var(--text-primary);
     text-align: justify;
-    text-justify: inter-word;
-    text-wrap: pretty;
     overflow-wrap: break-word;
+    word-wrap: break-word;
     word-break: normal;
     text-align-last: left;
 }
