@@ -74,9 +74,23 @@ async function initBlog() {
 
         // Initial render based on page
         const path = window.location.pathname;
-        if (path.endsWith('index.html') || path === '/' || path.endsWith('/')) {
-            renderFeaturedPost(blogPosts[0]);
-            renderPosts(blogPosts.slice(1));
+        const isHomePage = path.endsWith('index.html') || path === '/' || path.endsWith('/') || path.includes('index.html') || path === '';
+
+        // Always render categories in nav if possible
+        renderNavCategories();
+
+        if (isHomePage) {
+            const params = new URLSearchParams(window.location.search);
+            const categoryFilter = params.get('category');
+
+            if (categoryFilter) {
+                // Apply filter from URL
+                filterByCategory(categoryFilter, false);
+            } else {
+                renderFeaturedPost(blogPosts[0]);
+                renderPosts(blogPosts.slice(1));
+                renderCategorySections();
+            }
         } else if (path.endsWith('post.html')) {
             renderSinglePost();
         }
@@ -85,9 +99,97 @@ async function initBlog() {
     }
 }
 
+function renderNavCategories() {
+    const navCategories = document.getElementById('nav-categories');
+    if (!navCategories) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+
+    if (categories.length > 0) {
+        navCategories.innerHTML = `
+            <div class="nav-dropdown">
+                <button class="dropdown-trigger">Categories <i data-lucide="chevron-down"></i></button>
+                <div class="dropdown-content">
+                    ${categories.map(cat => `<a href="index.html?category=${encodeURIComponent(cat)}">${cat}</a>`).join('')}
+                </div>
+            </div>
+        `;
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+}
+
+function renderCategorySections() {
+    const container = document.getElementById('category-sections');
+    if (!container) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+
+    container.innerHTML = categories.map(category => {
+        const categoryPosts = blogPosts.filter(post => post.category === category).slice(0, 3);
+        const categoryId = `category-${category.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-')}`;
+
+        return `
+            <section id="${categoryId}" class="category-section" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 0;">${category}</h2>
+                    <a href="index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
+                </div>
+                <div class="article-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    ${categoryPosts.map(post => `
+                        <article class="article-card">
+                            <a href="post.html?id=${post.id}">
+                                <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
+                                <h3>${post.title}</h3>
+                                <p style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${post.excerpt}</p>
+                            </a>
+                        </article>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }).join('');
+}
+
+window.filterByCategory = function (category, shouldScroll = true) {
+    const featuredSection = document.getElementById('featured-post');
+    const categorySections = document.getElementById('category-sections');
+    const allArticlesHeader = document.getElementById('main-heading');
+
+    if (featuredSection) featuredSection.style.display = 'none';
+    if (categorySections) categorySections.style.display = 'none';
+    if (allArticlesHeader) {
+        allArticlesHeader.textContent = category;
+    }
+
+    const filtered = blogPosts.filter(post => post.category === category);
+    renderPosts(filtered);
+
+    // Update URL state
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('category') !== category) {
+        const newUrl = window.location.pathname + '?category=' + encodeURIComponent(category);
+        window.history.pushState({ category: category }, '', newUrl);
+    }
+
+    // Scroll to the top of the filtered items
+    if (shouldScroll) {
+        const scrollTarget = allArticlesHeader || document.getElementById('posts-container');
+        if (scrollTarget) {
+            window.scrollTo({ top: scrollTarget.offsetTop - 120, behavior: 'smooth' });
+        }
+    }
+};
+
 function renderPosts(posts) {
     const container = document.getElementById('posts-container');
     if (!container) return;
+
+    if (posts.length === 0) {
+        container.innerHTML = '<p>No articles found for this selection.</p>';
+        return;
+    }
 
     container.innerHTML = posts.map(post => `
         <article class="article-card">
@@ -241,11 +343,17 @@ if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
         const featuredSection = document.getElementById('featured-post');
+        const categorySections = document.getElementById('category-sections');
+        const allArticlesHeader = document.querySelector('h2');
 
         if (query.trim() !== '') {
             if (featuredSection) featuredSection.style.display = 'none';
+            if (categorySections) categorySections.style.display = 'none';
+            if (allArticlesHeader) allArticlesHeader.textContent = 'Search Results';
         } else {
             if (featuredSection) featuredSection.style.display = 'block';
+            if (categorySections) categorySections.style.display = 'block';
+            if (allArticlesHeader) allArticlesHeader.textContent = 'All Articles';
         }
 
         const filtered = blogPosts.filter(post =>
