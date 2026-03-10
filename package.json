@@ -4,6 +4,7 @@
   "description": "",
   "main": "scripts.js",
   "scripts": {
+    "build": "echo 'static site'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
