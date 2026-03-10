@@ -808,3 +808,48 @@ nav {
 :target {
     scroll-margin-top: 100px;
 }
+
+/* Footer Category List */
+.footer-sidebar {
+    text-align: left;
+    max-width: var(--max-content-width);
+    margin: 4rem auto 2rem;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.footer-sidebar h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-family: var(--font-heading);
+}
+
+.footer-category-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem 2.5rem;
+}
+
+.footer-category-list li {
+    padding: 0.25rem 0;
+}
+
+.footer-category-list a {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    transition: color 0.2s;
+    display: block;
+}
+
+.footer-category-list a:hover {
+    color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .footer-category-list {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

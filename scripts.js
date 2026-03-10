@@ -157,6 +157,9 @@ async function initBlog() {
         } else if (path.endsWith('post.html')) {
             renderSinglePost();
         }
+
+        // Render footer categories on all pages
+        renderFooterCategories();
     } catch (error) {
         console.error('Error loading blog posts:', error);
     }
@@ -213,6 +216,23 @@ function renderCategorySections() {
             </section>
         `;
     }).join('');
+}
+
+
+
+function renderFooterCategories() {
+    const footerContainer = document.getElementById('footer-categories');
+    if (!footerContainer) return;
+
+    const categories = [...new Set(blogPosts.map(post => post.category))];
+    if (categories.length > 0) {
+        footerContainer.innerHTML = `
+            <h3>Categories</h3>
+            <ul class="footer-category-list">
+                ${categories.map(cat => `<li><a href="index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
+            </ul>
+        `;
+    }
 }
 
 window.filterByCategory = function (category, shouldScroll = true) {
