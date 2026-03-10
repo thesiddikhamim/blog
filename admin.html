@@ -664,11 +664,7 @@
         // Initialization
         async function init() {
             try {
-                await Promise.all([
-                    refreshData(),
-                    loadCategories(),
-                    loadTags()
-                ]);
+                await refreshData(); // loads posts, then derives categories & tags
                 lucide.createIcons();
             } catch (err) {
                 console.error('Initialization failed:', err);
@@ -681,31 +677,20 @@
                 allPosts = await response.json();
                 renderPosts(allPosts);
                 updateStats();
+                deriveMetadata(); // build categories & tags from posts
             } catch (error) {
                 notify('Failed to load posts', 'error');
             }
         }
 
-        async function loadCategories() {
-            try {
-                const response = await fetch('/categories');
-                categories = await response.json();
-                console.log('Categories loaded:', categories);
-                renderCategoryOptions();
-            } catch (err) {
-                console.error('Failed to load categories:', err);
-            }
-        }
-
-        async function loadTags() {
-            try {
-                const response = await fetch('/tags');
-                tags = await response.json();
-                console.log('Tags loaded:', tags);
-                renderTagOptions();
-            } catch (err) {
-                console.error('Failed to load tags:', err);
-            }
+        // Derive categories and tags directly from loaded posts (works on Vercel & locally)
+        function deriveMetadata() {
+            categories = [...new Set(allPosts.map(p => p.category).filter(Boolean))].sort();
+            tags = [...new Set(allPosts.flatMap(p => p.tags || []).filter(Boolean))].sort();
+            console.log('Categories:', categories);
+            console.log('Tags:', tags);
+            renderCategoryOptions();
+            renderTagOptions();
         }
 
         console.log('Admin JS initialized');
@@ -838,9 +823,7 @@
                 if (result.success) {
                     notify('Great! Your work is now live.', 'success');
                     closeModal('upload-modal');
-                    refreshData();
-                    loadCategories();
-                    loadTags();
+                    refreshData(); // refreshData now also re-derives categories & tags
                 } else {
                     notify(result.message || 'Something went wrong', 'error');
                 }
@@ -869,12 +852,9 @@
         }
 
         // Edit Modal Logic
-        async function openEditModal(id) {
+        function openEditModal(id) {
             const post = allPosts.find(p => p.id === id);
             if (!post) return;
-
-            // Fresh data before editing
-            await Promise.all([loadCategories(), loadTags()]);
 
             document.getElementById('edit-post-id').value = post.id;
             document.getElementById('edit-title').value = post.title;
@@ -884,8 +864,12 @@
             document.getElementById('edit-excerpt').value = post.excerpt;
             document.getElementById('edit-image').value = post.image;
 
+            // Set editingTags FIRST, then render dropdowns so they correctly
+            // exclude this post's already-selected tags from the options list
             editingTags = [...(post.tags || [])];
             renderEditingTags();
+            renderCategoryOptions('');
+            renderTagOptions('');
             openModal('edit-modal');
         }
 
@@ -943,8 +927,9 @@
         function renderTagOptions(filter = '') {
             const val = filter.toLowerCase();
             const filtered = val ? tags.filter(t => t.toLowerCase().includes(val)) : tags;
-            // Only show tags not already selected
-            const available = filtered.filter(t => !editingTags.includes(t));
+            // Only show tags not already selected (case-insensitive)
+            const editingTagsLower = editingTags.map(t => t.toLowerCase());
+            const available = filtered.filter(t => !editingTagsLower.includes(t.toLowerCase()));
 
             tagOptions.innerHTML = available.map(tag => `
                 <div class="option-item" onclick="addTag('${tag.replace(/'/g, "\\'")}')">${tag}</div>
@@ -956,7 +941,9 @@
         }
 
         window.addTag = function (tag) {
-            if (!editingTags.includes(tag)) {
+            // Case-insensitive deduplication check
+            const tagLower = tag.toLowerCase();
+            if (!editingTags.some(t => t.toLowerCase() === tagLower)) {
                 editingTags.push(tag);
                 renderEditingTags();
             }
@@ -993,7 +980,9 @@
         }
 
         window.removeTag = function (tag) {
-            editingTags = editingTags.filter(t => t !== tag);
+            // Case-insensitive removal
+            const tagLower = tag.toLowerCase();
+            editingTags = editingTags.filter(t => t.toLowerCase() !== tagLower);
             renderEditingTags();
         };
 
@@ -1020,9 +1009,7 @@
                 if (result.success) {
                     notify('Changes saved', 'success');
                     closeModal('edit-modal');
-                    refreshData();
-                    loadCategories();
-                    loadTags();
+                    refreshData(); // also re-derives categories & tags
                 }
             } catch (err) {
                 notify('Failed to save', 'error');
