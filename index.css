@@ -979,6 +979,6 @@ nav {
 }
 
 /* Prevent unwanted focus outline on text elements tricked with tabindex="-1" */
-.article-body [tabindex="-1"]:focus {
+[data-no-tap-search="true"]:focus {
     outline: none;
 }

@@ -405,15 +405,6 @@ function renderSinglePost(post) {
                 }
             });
         });
-
-        // 4. Prevent Chrome Android "Tap to Search" on single click, but allow long press
-        const articleBody = container.querySelector('.article-body');
-        if (articleBody) {
-            articleBody.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote, span').forEach(el => {
-                el.setAttribute('tabindex', '-1');
-                el.addEventListener('click', function() {});
-            });
-        }
     }
 }
 
@@ -495,5 +486,48 @@ if (searchInput) {
     });
 }
 
+// Global Tap-to-Search Prevention for Chrome Android
+function setupTapToSearchPrevention() {
+    function applyToNode(node) {
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        
+        if (node.matches && node.matches('p, li, h1, h2, h3, h4, h5, h6, blockquote, span')) {
+            if (!node.hasAttribute('data-no-tap-search')) {
+                node.setAttribute('tabindex', '-1');
+                node.addEventListener('click', function() {});
+                node.setAttribute('data-no-tap-search', 'true');
+            }
+        }
+        
+        if (node.querySelectorAll) {
+            node.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote, span').forEach(el => {
+                if (!el.hasAttribute('data-no-tap-search')) {
+                    el.setAttribute('tabindex', '-1');
+                    el.addEventListener('click', function() {});
+                    el.setAttribute('data-no-tap-search', 'true');
+                }
+            });
+        }
+    }
+
+    applyToNode(document.body);
+
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                applyToNode(node);
+            });
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
 // Initialize
-document.addEventListener('DOMContentLoaded', initBlog);
+document.addEventListener('DOMContentLoaded', () => {
+    initBlog();
+    setupTapToSearchPrevention();
+});
