@@ -977,3 +977,8 @@ nav {
         gap: 1rem;
     }
 }
+
+/* Prevent unwanted focus outline on text elements tricked with tabindex="-1" */
+.article-body [tabindex="-1"]:focus {
+    outline: none;
+}

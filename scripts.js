@@ -405,6 +405,15 @@ function renderSinglePost(post) {
                 }
             });
         });
+
+        // 4. Prevent Chrome Android "Tap to Search" on single click, but allow long press
+        const articleBody = container.querySelector('.article-body');
+        if (articleBody) {
+            articleBody.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote, span').forEach(el => {
+                el.setAttribute('tabindex', '-1');
+                el.addEventListener('click', function() {});
+            });
+        }
     }
 }
 
