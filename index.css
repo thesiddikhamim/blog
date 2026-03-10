@@ -758,6 +758,9 @@ nav {
     font-size: 1.25rem;
     line-height: 1.8;
     color: var(--text-primary);
+    text-align: justify;
+    hyphens: auto;
+    text-wrap: pretty;
 }
 
 .article-body p {
