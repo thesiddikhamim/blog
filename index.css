@@ -619,6 +619,13 @@ nav {
     margin-bottom: var(--spacing-xl);
 }
 
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
 .article-card {
     border-bottom: 1px solid var(--border);
     padding-bottom: var(--spacing-md);
@@ -659,6 +666,11 @@ nav {
     }
 
     .article-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .related-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
