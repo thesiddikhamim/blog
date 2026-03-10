@@ -750,6 +750,11 @@ nav {
     .featured-card h2 {
         font-size: 1.5rem;
     }
+
+    .article-body {
+        font-size: 1.125rem;
+        line-height: 1.7;
+    }
 }
 
 /* Article Content Styling */
@@ -758,8 +763,11 @@ nav {
     font-size: 1.25rem;
     line-height: 1.8;
     color: var(--text-primary);
-    text-align: justify;
+    text-align: left;
+    /* Changed from justify to prevent broken gaps on mobile */
     text-wrap: pretty;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .article-body p {
