@@ -194,8 +194,13 @@ blockquote {
     padding: var(--spacing-md) var(--spacing-lg);
     margin: var(--spacing-lg) 0;
     font-style: italic;
-    font-size: 1.5rem;
+    font-size: 1.125rem;
     border-left: 4px solid var(--accent);
+}
+
+blockquote p {
+    font-size: inherit;
+    margin-bottom: 0;
 }
 
 blockquote::before {
@@ -709,7 +714,7 @@ nav {
     }
 
     blockquote {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         padding: var(--spacing-md);
         margin: var(--spacing-md) 0;
     }
