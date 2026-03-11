@@ -24,7 +24,7 @@ In one recorded question and answer session with Sheikh Saleh bin Fawzan al-Fawz
 
 In September 2016, Saudi Arabia’s current grand mufti Abdulaziz al-Sheikh told the Okaz Newspaper that Iranians, who are mostly Shia, are not Muslims, stating “We must understand that they are not Muslims, they are sons of Majus (a pejorative term for Zoroastrian), and their hostility with Muslims is a longstanding matter, particularly with Sunnis.”[^3]
 
-One of the greatest islamic scholar of sunni muslim in 21th century Abdulaziz bin Baz, In responding to a question regarding the difference between the Sunni and the Shia, bin Baz noted that some Shia are unbelievers while others are not, but that ==“among the most evil of them are the Twelver Imams and Al-Nusayriyyah== referring to the Alawi community who are also called Al-Rafidah." [^2] And they are the largest brach of shia muslims. [^7]
+One of the greatest islamic scholar of sunni muslim in 21th century Abdulaziz bin Baz, In responding to a question regarding the difference between the Sunni and the Shia, bin Baz noted that some Shia are unbelievers while others are not, but that “***among the most evil of them are the Twelver Imams and Al-Nusayriyyah*** referring to the Alawi community who are also called Al-Rafidah." [^2] And they are the largest brach of shia muslims. [^7]
 
 
 There was a incident where a six year old was killed just because of the fact that he is a shiah! Even though this is irrelevant but the way sunni muslim scholars spread hatred against them this kind thing can be occur[^5]
