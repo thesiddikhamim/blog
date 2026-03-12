@@ -235,7 +235,7 @@ app.put('/posts/:id/markdown', async (req, res) => {
         bodyContent = bodyContent.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
             const displayText = text || slug;
             const targetSlug = slugify(slug);
-            return `[${displayText}](?${targetSlug})`;
+            return `[${displayText}](/${targetSlug})`;
         });
 
         let htmlContent = md.render(bodyContent);
@@ -338,7 +338,7 @@ app.post('/upload', upload.fields([
         content = content.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
             const displayText = text || slug;
             const targetSlug = slugify(slug);
-            return `[${displayText}](?${targetSlug})`;
+            return `[${displayText}](/${targetSlug})`;
         });
 
         // 6. Convert Markdown to HTML and inject classes
