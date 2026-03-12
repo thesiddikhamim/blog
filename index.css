@@ -83,6 +83,11 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
@@ -430,14 +435,17 @@ nav {
         flex-direction: column;
         padding: 6rem 1.5rem 2rem;
         gap: 0.5rem;
-        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
         z-index: 10000;
         overflow-y: auto;
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+        box-shadow: none;
+        visibility: hidden;
     }
 
     .nav-links.active {
         right: 0;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+        visibility: visible;
     }
 
     #menu-toggle {
@@ -976,4 +984,9 @@ nav {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+}
+
+/* Prevent unwanted focus outline on text elements tricked with tabindex="-1" */
+[data-no-tap-search="true"]:focus {
+    outline: none;
 }

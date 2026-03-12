@@ -84,7 +84,7 @@ Adding new articles is simple. Just update the `posts.json` file in the root dir
 ## 👤 Author
 
 **Md Abu Bakkar Siddik Hamim**  
-*Question everything. Write it down.*
+*Still Thinking*
 
 ---
 
