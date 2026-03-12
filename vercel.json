@@ -2,8 +2,16 @@
     "cleanUrls": true,
     "rewrites": [
         {
-            "source": "/shiah-muslims",
+            "source": "/intro-to-philosophy",
             "destination": "/Posts/1/index.html"
+        },
+        {
+            "source": "/shiah-muslims",
+            "destination": "/Posts/2/index.html"
+        },
+        {
+            "source": "/why-socialism-by-albert-einstein",
+            "destination": "/Posts/3/index.html"
         },
         {
             "source": "/posts",

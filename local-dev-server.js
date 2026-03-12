@@ -121,7 +121,6 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
 
 // Setup multer for memory storage
 const storage = multer.memoryStorage();
@@ -500,6 +499,9 @@ app.post('/upload', upload.fields([
         res.status(500).send('Internal Server Error: ' + error.message);
     }
 });
+
+// Serve static files AFTER API routes to prevent folder matches from intercepting API calls
+app.use(express.static('.'));
 
 // Fallback route for local development to serve the static post from the post ID folder
 // This mimics Vercel's rewrite functionality locally
