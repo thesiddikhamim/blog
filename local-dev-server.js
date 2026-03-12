@@ -102,7 +102,7 @@ async function regenerateStaticPost(post, oldSlug = null) {
         // Add specific rewrite for this post
         vercelConfig.rewrites.push({
             source: `/${post.slug}`,
-            destination: `/Posts/${post.id}/index.html`
+            destination: `/Posts/${post.id}`
         });
 
         // Re-append fallback rewrites
@@ -205,6 +205,35 @@ app.put('/posts/:id', async (req, res) => {
         const oldSlug = posts[postIndex].slug;
         posts[postIndex] = { ...posts[postIndex], ...updatedData };
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+
+        // Sync metadata back to the master Markdown file's frontmatter
+        const postContentDir = path.join(POSTS_CONTENT_DIR, id.toString());
+        if (await fs.pathExists(postContentDir)) {
+            const files = await fs.readdir(postContentDir);
+            const mdFile = files.find(f => f.endsWith('.md'));
+            if (mdFile) {
+                const mdPath = path.join(postContentDir, mdFile);
+                const fileContent = await fs.readFile(mdPath, 'utf-8');
+                const parts = fileContent.split('---');
+                if (parts.length >= 3) {
+                    try {
+                        let frontMatter = yaml.load(parts[1]) || {};
+                        if (updatedData.title) frontMatter.title = updatedData.title;
+                        if (updatedData.category) frontMatter.category = updatedData.category;
+                        if (updatedData.tags) frontMatter.tags = updatedData.tags;
+                        if (updatedData.date) frontMatter.date = updatedData.date;
+                        if (updatedData.excerpt) frontMatter.excerpt = updatedData.excerpt;
+                        if (updatedData.image) frontMatter.image = updatedData.image;
+                        
+                        const newFrontMatter = yaml.dump(frontMatter);
+                        const newMdContent = `---\n${newFrontMatter}---\n${parts.slice(2).join('---').replace(/^\\s+/, '')}`;
+                        await fs.writeFile(mdPath, newMdContent, 'utf-8');
+                    } catch (err) {
+                        console.error('Error syncing frontmatter to .md file:', err);
+                    }
+                }
+            }
+        }
 
         await regenerateStaticPost(posts[postIndex], oldSlug);
 
