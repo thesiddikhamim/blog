@@ -2,8 +2,16 @@
     "cleanUrls": true,
     "rewrites": [
         {
+            "source": "/shiah-muslims",
+            "destination": "/Posts/1/index.html"
+        },
+        {
             "source": "/posts",
             "destination": "/posts.json"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ]
 }

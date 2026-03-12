@@ -21,6 +21,101 @@ const slugify = (text) => {
         .replace(/--+/g, '-');    // Replace multiple - with single -
 };
 
+function convertDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+async function regenerateStaticPost(post, oldSlug = null) {
+    try {
+        const indexTemplate = await fs.readFile(path.join(__dirname, 'index.html'), 'utf-8');
+        
+        let staticHtml = indexTemplate;
+        // Replace title
+        staticHtml = staticHtml.replace(/<title>.*?<\/title>/, `<title>${post.title} | Md Abu Bakkar Siddik Hamim</title>`);
+        // Hide home view
+        staticHtml = staticHtml.replace(/<div id="home-view">/, `<div id="home-view" style="display: none;">`);
+        
+        // Build post content
+        const postContentHtml = `
+        <article id="post-content" style="display: block;">
+            <div class="content-narrow">
+                <span class="accent-tag">${post.category}</span>
+                <h1 class="post-title">${post.title}</h1>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; color: var(--text-secondary);">
+                    <a href="/about/" style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden; display: block;" title="About the Author">
+                        <img src="/photos/self.webp" alt="Md Abu Bakkar Siddik Hamim" style="width: 100%; height: 100%; object-fit: cover;">
+                    </a>
+                    <div>
+                        <a href="/about/" class="author-link" style="font-size: 1.1rem; display: block; margin-bottom: 0.2rem;">Md Abu Bakkar Siddik Hamim</a>
+                        <small>${convertDate(post.date)}</small>
+                    </div>
+                </div>
+                ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-hero-image">` : ''}
+                <div class="article-body">
+                    ${post.content}
+                </div>
+                <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                    <h3>Tags</h3>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                        ${post.tags.map(tag => `<span style="background: var(--bg-secondary); padding: 0.25rem 0.75rem; font-size: 0.875rem;">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+            
+            <section style="margin-top: 6rem;" id="static-related-posts">
+                <!-- Related posts will be injected here by scripts.js dynamically to avoid staleness -->
+            </section>
+        </article>
+        <script>window.IS_STATIC_POST = true;</script>
+        `;
+
+        staticHtml = staticHtml.replace(/<article id="post-content" style="display: none;">[\s\S]*?<\/article>/, postContentHtml);
+
+        const postContentDir = path.join(POSTS_CONTENT_DIR, post.id.toString());
+        await fs.ensureDir(postContentDir);
+        // Save to Posts/<id>/index.html
+        await fs.writeFile(path.join(postContentDir, 'index.html'), staticHtml);
+
+        // Update vercel.json rewrite instead of creating a folder
+        const vercelPath = path.join(__dirname, 'vercel.json');
+        let vercelConfig = { cleanUrls: true, rewrites: [] };
+        if (await fs.pathExists(vercelPath)) {
+            try {
+                vercelConfig = JSON.parse(await fs.readFile(vercelPath, 'utf-8'));
+            } catch (err) {
+                console.error("Could not parse vercel.json", err);
+            }
+        }
+
+        // Initialize rewrites if not existing
+        if (!vercelConfig.rewrites) vercelConfig.rewrites = [];
+
+        // Remove old rewrites for this post, and default rewrites so we can append them at the end
+        vercelConfig.rewrites = vercelConfig.rewrites.filter(r => 
+            r.source !== `/${post.slug}` && 
+            (oldSlug ? r.source !== `/${oldSlug}` : true) &&
+            r.source !== "/posts" && 
+            r.source !== "/(.*)"
+        );
+
+        // Add specific rewrite for this post
+        vercelConfig.rewrites.push({
+            source: `/${post.slug}`,
+            destination: `/Posts/${post.id}/index.html`
+        });
+
+        // Re-append fallback rewrites
+        vercelConfig.rewrites.push({ source: "/posts", destination: "/posts.json" });
+        vercelConfig.rewrites.push({ source: "/(.*)", destination: "/index.html" });
+
+        await fs.writeFile(vercelPath, JSON.stringify(vercelConfig, null, 4));
+        console.log(`Updated vercel.json for ${post.slug}`);
+    } catch (e) {
+        console.error('Error generating static post for ' + post.slug, e);
+    }
+}
+
 const app = express();
 const port = 3000;
 
@@ -108,8 +203,11 @@ app.put('/posts/:id', async (req, res) => {
         }
 
         // Update post metadata
+        const oldSlug = posts[postIndex].slug;
         posts[postIndex] = { ...posts[postIndex], ...updatedData };
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+
+        await regenerateStaticPost(posts[postIndex], oldSlug);
 
         res.json({ success: true, post: posts[postIndex] });
     } catch (error) {
@@ -124,13 +222,29 @@ app.delete('/posts/:id', async (req, res) => {
         const id = parseInt(req.params.id);
         let posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
 
-        // Find existing post to log deletion
-        const postExists = posts.some(p => p.id === id);
-        if (!postExists) return res.status(404).json({ success: false, message: 'Post not found.' });
+        // Find existing post to log deletion and get slug
+        const postToDelete = posts.find(p => p.id === id);
+        if (!postToDelete) return res.status(404).json({ success: false, message: 'Post not found.' });
 
         // Filter out the post
         posts = posts.filter(p => p.id !== id);
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+
+        // DELETE REWRITE IN VERCEL.JSON
+        if (postToDelete.slug) {
+            const vercelPath = path.join(__dirname, 'vercel.json');
+            if (await fs.pathExists(vercelPath)) {
+                try {
+                    let vercelConfig = JSON.parse(await fs.readFile(vercelPath, 'utf-8'));
+                    if (vercelConfig.rewrites) {
+                        vercelConfig.rewrites = vercelConfig.rewrites.filter(r => r.source !== `/${postToDelete.slug}`);
+                        await fs.writeFile(vercelPath, JSON.stringify(vercelConfig, null, 4));
+                    }
+                } catch (err) {
+                    console.error("Could not parse vercel.json during deletion", err);
+                }
+            }
+        }
 
         // DELETE THE CONTENT DIRECTORY FOR THIS POST
         const postContentDir = path.join(POSTS_CONTENT_DIR, id.toString());
@@ -139,6 +253,10 @@ app.delete('/posts/:id', async (req, res) => {
             console.log(`Deleted content for post ${id}`);
         }
 
+        // DELETE THE STATIC SLUG FOLDER
+        const postToDel = posts.find(p => p.id === id); // But wait, we already filtered it out
+        // Wait, need to find it before filtering to delete slug
+        // Let's modify above logic slightly
         res.json({ success: true });
     } catch (error) {
         console.error('DELETE error:', error);
@@ -211,6 +329,8 @@ app.put('/posts/:id/markdown', async (req, res) => {
         
         if (postIndex === -1) return res.status(404).json({ success: false, message: 'Post not found in posts.json' });
         
+        const oldSlug = posts[postIndex].slug;
+        
         const files = await fs.readdir(postContentDir);
         const imageMap = {};
         for (const file of files) {
@@ -252,6 +372,8 @@ app.put('/posts/:id/markdown', async (req, res) => {
         
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
         
+        await regenerateStaticPost(posts[postIndex], oldSlug);
+
         res.json({ success: true, post: posts[postIndex] });
     } catch (error) {
         console.error('PUT /posts/:id/markdown error:', error);
@@ -370,10 +492,39 @@ app.post('/upload', upload.fields([
         posts.unshift(newPost);
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
 
+        await regenerateStaticPost(newPost);
+
         res.json({ success: true, post: newPost });
     } catch (error) {
         console.error('Upload error:', error);
         res.status(500).send('Internal Server Error: ' + error.message);
+    }
+});
+
+// Fallback route for local development to serve the static post from the post ID folder
+// This mimics Vercel's rewrite functionality locally
+app.get('/:slug', async (req, res, next) => {
+    try {
+        const posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const post = posts.find(p => p.slug === req.params.slug);
+        if (post) {
+            const staticHtmlPath = path.join(POSTS_CONTENT_DIR, post.id.toString(), 'index.html');
+            if (await fs.pathExists(staticHtmlPath)) {
+                return res.sendFile(staticHtmlPath);
+            }
+        }
+    } catch (err) {
+        console.error("Local routing error:", err);
+    }
+    next();
+});
+
+// Single Page App Fallback locally mimicking vercel rewrites /index.html
+app.use((req, res) => {
+    if (req.method === 'GET') {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    } else {
+        res.status(404).send('Not found');
     }
 });
 

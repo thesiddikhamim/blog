@@ -151,21 +151,60 @@ async function initBlog() {
         const params = new URLSearchParams(window.location.search);
         const categoryFilter = params.get('category');
 
-        // Identify if a post slug is present (e.g. ?why-socialism)
-        // A slug is present if there is a search string that doesn't start with 'category' or 'id'
+        // Extract path for slug
+        let pathSlug = window.location.pathname.replace(/^\/|\/$/g, '');
+        if (pathSlug === 'index.html') {
+            pathSlug = '';
+        }
+
+        // Support for old search-based URLs
         const firstParamKey = params.keys().next().value;
-        const isPostSlug = firstParamKey && firstParamKey !== 'category' && firstParamKey !== 'id';
-        const post = isPostSlug ? blogPosts.find(p => p.slug === firstParamKey) : null;
+        const searchSlug = (firstParamKey && firstParamKey !== 'category' && firstParamKey !== 'id') ? firstParamKey : null;
+
+        const effectiveSlug = pathSlug || searchSlug;
 
         const homeView = document.getElementById('home-view');
         const postView = document.getElementById('post-content');
 
-        if (post) {
-            // SHOW SINGLE POST
+        const reservedPaths = ['about', 'contact', 'admin'];
+
+        if (effectiveSlug && !reservedPaths.includes(effectiveSlug)) {
+            const post = blogPosts.find(p => p.slug === effectiveSlug);
+
+            // SHOW SINGLE POST OR 404
             if (homeView) homeView.style.display = 'none';
             if (postView) {
                 postView.style.display = 'block';
-                renderSinglePost(post);
+                if (window.IS_STATIC_POST) {
+                    // Statically generated page
+                    if (post) {
+                        const relatedContainer = document.getElementById('static-related-posts');
+                        if (relatedContainer) {
+                            relatedContainer.innerHTML = `
+                                <h2>Related Posts</h2>
+                                <div class="related-grid">
+                                    ${renderRelatedPosts(post)}
+                                </div>
+                            `;
+                        }
+                    }
+                    bindPostInteractions(postView);
+                } else if (post) {
+                    // Dynamically generated page
+                    renderSinglePost(post);
+                } else {
+                    document.title = `Page Not Found | Md Abu Bakkar Siddik Hamim`;
+                    postView.innerHTML = `
+                        <div style="text-align: center; padding: 6rem 1rem;">
+                            <h1 style="font-size: 3rem; margin-bottom: 1rem;">404</h1>
+                            <h2>Page Not Found</h2>
+                            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 1.1rem;">
+                                The article or path "<strong>${effectiveSlug}</strong>" does not exist.
+                            </p>
+                            <a href="/" style="display: inline-block; margin-top: 2rem; padding: 0.75rem 1.5rem; background: var(--text); color: var(--bg); text-decoration: none; border-radius: 4px; font-weight: bold; transition: opacity 0.2s;">Go to Homepage</a>
+                        </div>
+                    `;
+                }
             }
         } else if (categoryFilter) {
             // SHOW CATEGORY FILTER
@@ -226,7 +265,7 @@ function renderCategorySections() {
                 <div class="article-grid">
                     ${categoryPosts.map(post => `
                         <article class="article-card">
-                            <a href="?${post.slug}">
+                            <a href="/${post.slug}">
                                 <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
                                 <h3>${post.title}</h3>
                                 <p style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${post.excerpt}</p>
@@ -310,7 +349,7 @@ function renderPosts(posts) {
 
     container.innerHTML = posts.map(post => `
         <article class="article-card">
-            <a href="?${post.slug}">
+            <a href="/${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
@@ -362,50 +401,54 @@ function renderSinglePost(post) {
             </section>
         `;
 
-        // Process all links to open in new tab and handle footnotes
-        const articleLinks = container.querySelectorAll('.article-body a');
-        articleLinks.forEach(link => {
-            // 1. External links open in new tab
-            if (link.hostname !== window.location.hostname && link.hostname !== '') {
-                link.setAttribute('target', '_blank');
-                link.setAttribute('rel', 'noopener noreferrer');
-            }
+        bindPostInteractions(container);
+    }
+}
 
-            // 2. Footnote smooth scroll and highlight
-            if (link.classList.contains('footnote-ref') || link.classList.contains('footnote-backref')) {
-                link.addEventListener('click', (e) => {
-                    const targetId = link.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
+function bindPostInteractions(container) {
+    // Process all links to open in new tab and handle footnotes
+    const articleLinks = container.querySelectorAll('.article-body a');
+    articleLinks.forEach(link => {
+        // 1. External links open in new tab
+        if (link.hostname !== window.location.hostname && link.hostname !== '') {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+        }
 
-                    if (targetElement) {
-                        // Apply unique highlight class based on direction
-                        const highlightClass = link.classList.contains('footnote-ref') ? 'footnote-target-highlight' : 'footnote-ref-highlight';
+        // 2. Footnote smooth scroll and highlight
+        if (link.classList.contains('footnote-ref') || link.classList.contains('footnote-backref')) {
+            link.addEventListener('click', (e) => {
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
 
-                        targetElement.classList.add(highlightClass);
+                if (targetElement) {
+                    // Apply unique highlight class based on direction
+                    const highlightClass = link.classList.contains('footnote-ref') ? 'footnote-target-highlight' : 'footnote-ref-highlight';
 
-                        // Remove after animation (2.5s to be safe)
-                        setTimeout(() => {
-                            targetElement.classList.remove(highlightClass);
-                        }, 2500);
-                    }
-                });
-            }
-        });
+                    targetElement.classList.add(highlightClass);
 
-        // 3. Make the whole footnote list item clickable to go back to source
-        const footnoteItems = container.querySelectorAll('.footnote-item');
-        footnoteItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                // If they clicked the back-arrow specifically, don't do it twice
-                if (e.target.classList.contains('footnote-backref')) return;
-
-                const backRefLink = item.querySelector('.footnote-backref');
-                if (backRefLink) {
-                    backRefLink.click();
+                    // Remove after animation (2.5s to be safe)
+                    setTimeout(() => {
+                        targetElement.classList.remove(highlightClass);
+                    }, 2500);
                 }
             });
+        }
+    });
+
+    // 3. Make the whole footnote list item clickable to go back to source
+    const footnoteItems = container.querySelectorAll('.footnote-item');
+    footnoteItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            // If they clicked the back-arrow specifically, don't do it twice
+            if (e.target.classList.contains('footnote-backref')) return;
+
+            const backRefLink = item.querySelector('.footnote-backref');
+            if (backRefLink) {
+                backRefLink.click();
+            }
         });
-    }
+    });
 }
 
 
@@ -417,7 +460,7 @@ function renderRelatedPosts(currentPost) {
 
     return related.map(post => `
         <article class="article-card">
-            <a href="?${post.slug}">
+            <a href="/${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
@@ -434,12 +477,12 @@ function renderFeaturedPost(post) {
 
     container.innerHTML = `
         <article class="featured-card">
-            <a href="?${post.slug}">
+            <a href="/${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
             </a>
             <div>
                 <span class="accent-tag">${post.category}</span>
-                <h2><a href="?${post.slug}">${post.title}</a></h2>
+                <h2><a href="/${post.slug}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
                     <a href="/about/">
