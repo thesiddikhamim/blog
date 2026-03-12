@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor | Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Serif+4:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            background: var(--bg-secondary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .editor-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .editor-container {
+            flex-grow: 1;
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .editor-textarea {
+            flex-grow: 1;
+            width: 100%;
+            padding: 1.5rem;
+            border: none;
+            resize: none;
+            font-family: monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* Notifications */
+        #notification-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+        }
+
+        .notification {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .notification.active {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left-color: #10b981;
+        }
+
+        .notification.error {
+            border-left-color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="editor-header">
+        <h1>Editing: <span id="post-title" class="accent-tag">Loading...</span></h1>
+        <div class="editor-actions">
+            <button class="btn" onclick="window.location.href='admin.html'">Back to Dashboard</button>
+            <button class="btn" id="save-btn" style="background: var(--accent); color: white; border: none;">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="editor-container">
+        <div class="editor-pane">
+            <textarea id="markdown-input" class="editor-textarea" placeholder="Loading content..."></textarea>
+        </div>
+    </div>
+
+    <div id="notification-container"></div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        let currentFileName = '';
+
+        if (!postId) {
+            alert('No post ID provided.');
+            window.location.href = 'admin.html';
+        }
+
+        const mdInput = document.getElementById('markdown-input');
+        const saveBtn = document.getElementById('save-btn');
+        const titleSpan = document.getElementById('post-title');
+
+        async function loadContent() {
+            try {
+                // Fetch post details for title
+                const postRes = await fetch(`/posts/${postId}`);
+                if (!postRes.ok) throw new Error('Post not found');
+                const post = await postRes.json();
+                titleSpan.textContent = post.title;
+
+                // Fetch raw markdown file content
+                const mdRes = await fetch(`/posts/${postId}/markdown`);
+                if (mdRes.ok) {
+                    const data = await mdRes.json();
+                    if (data.success) {
+                        mdInput.value = data.content;
+                        currentFileName = data.fileName;
+                    } else {
+                        throw new Error(data.message || 'Markdown not found');
+                    }
+                } else {
+                    // Fallback to raw_content from posts.json if .md file endpoint fails or missing
+                    mdInput.value = post.raw_content || '<!-- No raw markdown found. -->\n';
+                }
+            } catch (err) {
+                console.error(err);
+                notify('Failed to load content', 'error');
+                mdInput.value = 'Failed to load content.';
+            }
+        }
+
+        saveBtn.addEventListener('click', async () => {
+            const content = mdInput.value;
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            try {
+                const response = await fetch(`/posts/${postId}/markdown`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, fileName: currentFileName })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    notify('Markdown saved successfully!', 'success');
+                } else {
+                    notify(result.message || 'Error saving markdown', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                notify('Connection error', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Changes';
+            }
+        });
+
+        function notify(msg, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const el = document.createElement('div');
+            el.className = `notification ${type}`;
+            el.innerHTML = `
+                <i class="lucide-${type === 'success' ? 'check-circle' : 'alert-circle'}"></i>
+                <span>${msg}</span>
+            `;
+            container.appendChild(el);
+            setTimeout(() => el.classList.add('active'), 10);
+            setTimeout(() => {
+                el.classList.remove('active');
+                setTimeout(() => el.remove(), 400);
+            }, 4000);
+        }
+
+        loadContent();
+    </script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>

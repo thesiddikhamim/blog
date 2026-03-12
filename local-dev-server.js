@@ -100,6 +100,13 @@ app.put('/posts/:id', async (req, res) => {
 
         if (postIndex === -1) return res.status(404).json({ success: false, message: 'Post not found.' });
 
+        // Generate new HTML if raw_content was provided
+        if (updatedData.raw_content) {
+            let htmlContent = md.render(updatedData.raw_content);
+            htmlContent = htmlContent.replace(/<img /g, '<img class="article-image" ');
+            updatedData.content = htmlContent;
+        }
+
         // Update post metadata
         posts[postIndex] = { ...posts[postIndex], ...updatedData };
         await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
@@ -136,6 +143,119 @@ app.delete('/posts/:id', async (req, res) => {
     } catch (error) {
         console.error('DELETE error:', error);
         res.status(500).send('Error deleting post.');
+    }
+});
+
+// GET /posts/:id/markdown - Get raw markdown file content
+app.get('/posts/:id/markdown', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const postContentDir = path.join(POSTS_CONTENT_DIR, id.toString());
+        
+        if (!(await fs.pathExists(postContentDir))) {
+            return res.status(404).json({ success: false, message: 'Content directory not found.' });
+        }
+        
+        const files = await fs.readdir(postContentDir);
+        const mdFile = files.find(f => f.endsWith('.md'));
+        
+        if (!mdFile) {
+            return res.status(404).json({ success: false, message: 'Markdown file not found.' });
+        }
+        
+        const mdContent = await fs.readFile(path.join(postContentDir, mdFile), 'utf-8');
+        res.json({ success: true, content: mdContent, fileName: mdFile });
+    } catch (error) {
+        console.error('GET /posts/:id/markdown error:', error);
+        res.status(500).json({ success: false, message: 'Error reading markdown.' });
+    }
+});
+
+// PUT /posts/:id/markdown - Update raw markdown file and update posts.json content
+app.put('/posts/:id/markdown', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const { content, fileName } = req.body;
+        
+        if (!content) return res.status(400).json({ success: false, message: 'Content is required.' });
+        
+        const postContentDir = path.join(POSTS_CONTENT_DIR, id.toString());
+        if (!(await fs.pathExists(postContentDir))) {
+            return res.status(404).json({ success: false, message: 'Content directory not found.' });
+        }
+        
+        // Write the new content to the .md file
+        const mdFileName = fileName || 'post.md';
+        await fs.writeFile(path.join(postContentDir, mdFileName), content, 'utf-8');
+        
+        // Parse the new markdown
+        const parts = content.split('---');
+        let bodyContent = content;
+        let frontMatter = {};
+        
+        if (parts.length >= 3) {
+            try {
+                frontMatter = yaml.load(parts[1]);
+                bodyContent = parts.slice(2).join('---').trim();
+            } catch (err) {
+                console.error('YAML parse error during markdown update:', err);
+            }
+        }
+        
+        // Convert invisible markers
+        bodyContent = bodyContent.replace(/\u00A0/g, ' ');
+        
+        // Update posts list
+        let posts = JSON.parse(await fs.readFile(POSTS_FILE, 'utf-8'));
+        const postIndex = posts.findIndex(p => p.id === id);
+        
+        if (postIndex === -1) return res.status(404).json({ success: false, message: 'Post not found in posts.json' });
+        
+        const files = await fs.readdir(postContentDir);
+        const imageMap = {};
+        for (const file of files) {
+            if (file.endsWith('.webp')) {
+                const baseName = path.basename(file, '.webp');
+                imageMap[baseName] = `/Posts/${id}/${file}`;
+                imageMap[file] = `/Posts/${id}/${file}`;
+                imageMap[baseName + '.png'] = `/Posts/${id}/${file}`;
+                imageMap[baseName + '.jpg'] = `/Posts/${id}/${file}`;
+                imageMap[baseName + '.jpeg'] = `/Posts/${id}/${file}`;
+            }
+        }
+
+        bodyContent = bodyContent.replace(/!\[\[(.*?)\]\]/g, (match, fName) => {
+            const webpPath = imageMap[fName] || imageMap[path.basename(fName)];
+            if (webpPath) {
+                return `![${fName}](${webpPath})`;
+            }
+            return match;
+        });
+
+        bodyContent = bodyContent.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
+            const displayText = text || slug;
+            const targetSlug = slugify(slug);
+            return `[${displayText}](?${targetSlug})`;
+        });
+
+        let htmlContent = md.render(bodyContent);
+        htmlContent = htmlContent.replace(/<img /g, '<img class="article-image" ');
+        
+        if (frontMatter.title) posts[postIndex].title = frontMatter.title;
+        if (frontMatter.category) posts[postIndex].category = frontMatter.category;
+        if (frontMatter.tags) posts[postIndex].tags = frontMatter.tags;
+        if (frontMatter.date) posts[postIndex].date = frontMatter.date;
+        if (frontMatter.excerpt) posts[postIndex].excerpt = frontMatter.excerpt;
+        
+        posts[postIndex].content = htmlContent;
+        posts[postIndex].raw_content = bodyContent;
+        
+        await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4));
+        
+        res.json({ success: true, post: posts[postIndex] });
+    } catch (error) {
+        console.error('PUT /posts/:id/markdown error:', error);
+        res.status(500).json({ success: false, message: 'Error saving markdown.' });
     }
 });
 
@@ -209,7 +329,7 @@ app.post('/upload', upload.fields([
         content = content.replace(/!\[\[(.*?)\]\]/g, (match, fileName) => {
             const webpPath = imageMap[fileName] || imageMap[path.basename(fileName)];
             if (webpPath) {
-                return `<img src="${webpPath}" alt="${fileName}" class="article-image">`;
+                return `![${fileName}](${webpPath})`;
             }
             return match;
         });
@@ -218,11 +338,12 @@ app.post('/upload', upload.fields([
         content = content.replace(/\[\[(.*?)(?:\|(.*?))?\]\]/g, (match, slug, text) => {
             const displayText = text || slug;
             const targetSlug = slugify(slug);
-            return `<a href="?${targetSlug}">${displayText}</a>`;
+            return `[${displayText}](?${targetSlug})`;
         });
 
-        // 6. Convert Markdown to HTML
-        const htmlContent = md.render(content);
+        // 6. Convert Markdown to HTML and inject classes
+        let htmlContent = md.render(content);
+        htmlContent = htmlContent.replace(/<img /g, '<img class="article-image" ');
 
         // 7. Explicitly handle Hero/Cover Image
         let heroImage = frontMatter.image || '';
@@ -242,6 +363,7 @@ app.post('/upload', upload.fields([
             date: frontMatter.date || new Date().toISOString(),
             excerpt: frontMatter.excerpt || '',
             content: htmlContent,
+            raw_content: content,
             image: heroImage
         };
 
