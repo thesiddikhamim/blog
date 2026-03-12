@@ -1,5 +1,6 @@
 {
     "cleanUrls": true,
+    "trailingSlash": false,
     "rewrites": [
         {
             "source": "/intro-to-philosophy",
@@ -18,7 +19,7 @@
             "destination": "/posts.json"
         },
         {
-            "source": "/(.*)",
+            "source": "/:path((?!posts|index.html|scripts.js|index.css|photos|Posts|admin.html|editor.html|about|contact|font|README.md).*)",
             "destination": "/index.html"
         }
     ]

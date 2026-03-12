@@ -96,7 +96,7 @@ async function regenerateStaticPost(post, oldSlug = null) {
             r.source !== `/${post.slug}` && 
             (oldSlug ? r.source !== `/${oldSlug}` : true) &&
             r.source !== "/posts" && 
-            r.source !== "/(.*)"
+            r.destination !== "/index.html"
         );
 
         // Add specific rewrite for this post
@@ -107,7 +107,10 @@ async function regenerateStaticPost(post, oldSlug = null) {
 
         // Re-append fallback rewrites
         vercelConfig.rewrites.push({ source: "/posts", destination: "/posts.json" });
-        vercelConfig.rewrites.push({ source: "/(.*)", destination: "/index.html" });
+        vercelConfig.rewrites.push({ 
+            source: "/:path((?!posts|index.html|scripts.js|index.css|photos|Posts|admin.html|editor.html|about|contact|font|README.md).*)", 
+            destination: "/index.html" 
+        });
 
         await fs.writeFile(vercelPath, JSON.stringify(vercelConfig, null, 4));
         console.log(`Updated vercel.json for ${post.slug}`);
