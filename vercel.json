@@ -4,10 +4,6 @@
         {
             "source": "/posts",
             "destination": "/posts.json"
-        },
-        {
-            "source": "/((?!about|contact|Posts|photos|font|admin|editor|.*\\.).*)",
-            "destination": "/index.html"
         }
     ]
 }

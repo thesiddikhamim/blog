@@ -148,24 +148,14 @@ async function initBlog() {
         updateThemeIcon();
 
         // 2. Routing Logic
-        const path = window.location.pathname;
         const params = new URLSearchParams(window.location.search);
         const categoryFilter = params.get('category');
 
-        // Identify if a post slug is present in the path (e.g. /shiah-muslims)
-        const slugFromPath = path.split('/').filter(Boolean)[0];
-        
-        let post = null;
-        if (slugFromPath && !['index.html', 'about', 'contact', 'admin', 'editor'].includes(slugFromPath)) {
-            post = blogPosts.find(p => p.slug === slugFromPath);
-        }
-
-        // Fallback for old style links or direct query params if needed
-        if (!post) {
-            const firstParamKey = params.keys().next().value;
-            const isPostSlugParam = firstParamKey && firstParamKey !== 'category' && firstParamKey !== 'id';
-            if (isPostSlugParam) post = blogPosts.find(p => p.slug === firstParamKey);
-        }
+        // Identify if a post slug is present (e.g. ?why-socialism)
+        // A slug is present if there is a search string that doesn't start with 'category' or 'id'
+        const firstParamKey = params.keys().next().value;
+        const isPostSlug = firstParamKey && firstParamKey !== 'category' && firstParamKey !== 'id';
+        const post = isPostSlug ? blogPosts.find(p => p.slug === firstParamKey) : null;
 
         const homeView = document.getElementById('home-view');
         const postView = document.getElementById('post-content');
@@ -207,7 +197,7 @@ function renderNavCategories() {
             <div class="nav-dropdown">
                 <button class="dropdown-trigger">Categories <i data-lucide="chevron-down"></i></button>
                 <div class="dropdown-content">
-                    ${categories.map(cat => `<a href="/?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a>`).join('')}
+                    ${categories.map(cat => `<a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a>`).join('')}
                 </div>
             </div>
         `;
@@ -231,12 +221,12 @@ function renderCategorySections() {
             <section id="${categoryId}" class="category-section" style="margin-top: 6rem; padding-top: 4rem; border-top: 1px solid var(--border);">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
                     <h2 style="margin-bottom: 0;">${category}</h2>
-                    <a href="/?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
+                    <a href="/index.html?category=${encodeURIComponent(category)}" class="view-all" onclick="filterByCategory('${category}'); return false;">View All ${category}</a>
                 </div>
                 <div class="article-grid">
                     ${categoryPosts.map(post => `
                         <article class="article-card">
-                            <a href="/${post.slug}">
+                            <a href="?${post.slug}">
                                 <img src="${post.image}" alt="${post.title}" class="cover-image" style="aspect-ratio: 16/9;">
                                 <h3>${post.title}</h3>
                                 <p style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${post.excerpt}</p>
@@ -260,7 +250,7 @@ function renderFooterCategories() {
         footerContainer.innerHTML = `
             <h3>Categories</h3>
             <ul class="footer-category-list">
-                ${categories.map(cat => `<li><a href="/?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
+                ${categories.map(cat => `<li><a href="/index.html?category=${encodeURIComponent(cat)}" onclick="filterByCategory('${cat}'); return false;">${cat}</a></li>`).join('')}
             </ul>
         `;
     }
@@ -276,7 +266,7 @@ window.filterByCategory = function (category, shouldScroll = true) {
 
     // If we're not on the listing page (index.html), redirect to it
     if (!postsContainer) {
-        window.location.href = `/?category=${encodeURIComponent(category)}`;
+        window.location.href = `/index.html?category=${encodeURIComponent(category)}`;
         return;
     }
 
@@ -296,7 +286,7 @@ window.filterByCategory = function (category, shouldScroll = true) {
     // Update URL state
     const params = new URLSearchParams(window.location.search);
     if (params.get('category') !== category) {
-        const newUrl = '/?category=' + encodeURIComponent(category);
+        const newUrl = window.location.pathname + '?category=' + encodeURIComponent(category);
         window.history.pushState({ category: category }, '', newUrl);
     }
 
@@ -320,7 +310,7 @@ function renderPosts(posts) {
 
     container.innerHTML = posts.map(post => `
         <article class="article-card">
-            <a href="/${post.slug}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
@@ -427,7 +417,7 @@ function renderRelatedPosts(currentPost) {
 
     return related.map(post => `
         <article class="article-card">
-            <a href="/${post.slug}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
                 <span class="accent-tag">${post.category}</span>
                 <h3>${post.title}</h3>
@@ -444,12 +434,12 @@ function renderFeaturedPost(post) {
 
     container.innerHTML = `
         <article class="featured-card">
-            <a href="/${post.slug}">
+            <a href="?${post.slug}">
                 <img src="${post.image}" alt="${post.title}" class="cover-image">
             </a>
             <div>
                 <span class="accent-tag">${post.category}</span>
-                <h2><a href="/${post.slug}">${post.title}</a></h2>
+                <h2><a href="?${post.slug}">${post.title}</a></h2>
                 <p>${post.excerpt}</p>
                 <div class="featured-author">
                     <a href="/about/">
