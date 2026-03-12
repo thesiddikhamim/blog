@@ -3,16 +3,8 @@
     "trailingSlash": false,
     "rewrites": [
         {
-            "source": "/intro-to-philosophy",
-            "destination": "/Posts/1"
-        },
-        {
-            "source": "/shiah-muslims",
-            "destination": "/Posts/2"
-        },
-        {
             "source": "/why-socialism-by-albert-einstein",
-            "destination": "/Posts/3"
+            "destination": "/Posts/1"
         },
         {
             "source": "/posts",
