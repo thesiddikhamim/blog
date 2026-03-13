@@ -5,12 +5,6 @@
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'Denton Condensed Test';
-    src: url('font/DentonCondensedTest-BoldItalic.otf') format('opentype');
-    font-weight: bold;
-    font-style: italic;
-}
 
 @font-face {
     font-family: 'Denton Condensed Test';
@@ -24,13 +18,6 @@
     src: url('font/DentonCondensedTest-BlackItalic.otf') format('opentype');
     font-weight: 900;
     font-style: italic;
-}
-
-@font-face {
-    font-family: 'Denton Condensed Test';
-    src: url('font/DentonCondensedTest-ExtraBold.otf') format('opentype');
-    font-weight: 800;
-    font-style: normal;
 }
 
 :root {
