@@ -3,12 +3,12 @@
     "trailingSlash": false,
     "rewrites": [
         {
-            "source": "/why-socialism-by-albert-einstein",
-            "destination": "/Posts/1"
-        },
-        {
             "source": "/intro-to-philosophy",
             "destination": "/Posts/2"
+        },
+        {
+            "source": "/why-socialism-by-albert-einstein",
+            "destination": "/Posts/1"
         },
         {
             "source": "/posts",
